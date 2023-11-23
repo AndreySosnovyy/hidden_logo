@@ -40,7 +40,7 @@ class IosHiddenLogoUtil {
 
   final BaseDeviceInfo deviceInfo;
 
-  String get _deviceName => deviceInfo.data['name'];
+  String get _deviceName => deviceInfo.data['name'] ?? '';
 
   bool get _isTargetIPhone => _currentIPhone != null;
 
@@ -75,6 +75,9 @@ class IosHiddenLogoUtil {
   }
 
   _IPhone? get _currentIPhone {
+    final deviceName = _deviceName;
+    if (deviceName.isEmpty) return null;
+    if (!deviceName.contains('iPhone ')) return null;
     return switch (_deviceName.toLowerCase().substring('iPhone '.length)) {
       'x' => _IPhone.x,
       'xʀ' || 'xr' => _IPhone.xr,
