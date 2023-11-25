@@ -87,5 +87,5 @@ because the actual shape and size configuration of
 further devices are unknown in advance!<br>
 But the package will be updated as soon as possible after the release!
 
-**Any Issues or Pull request are appreciated!**<br>
+**Any Issues or Pull requests are appreciated!**<br>
 **Thanks!**
