@@ -9,8 +9,6 @@ topics:
   - ui
   - logo
   - brand
-  - dynamic island
-  - notch
 
 environment:
   sdk: '>=3.1.0 <4.0.0'
