@@ -1,3 +1,7 @@
+## 0.0.3
+
+* Fix README and add topics
+
 ## 0.0.2
 
 * Fix analysis issues
