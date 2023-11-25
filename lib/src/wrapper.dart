@@ -96,10 +96,19 @@ class _HiddenLogoState extends State<HiddenLogo> with WidgetsBindingObserver {
                     top: notchUtil.dynamicIslandTopMargin,
                   ),
                   child: switch (notchUtil.logoType) {
-                    LogoType.notch =>
-                      widget.notchBuilder(context, logoConstraints),
-                    LogoType.dynamicIsland =>
-                      widget.dynamicIslandBuilder(context, logoConstraints),
+                    LogoType.notch => widget.notchBuilder(
+                        context,
+                        logoConstraints,
+                      ),
+                    LogoType.dynamicIsland => ClipRRect(
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(18.0),
+                        ),
+                        child: widget.dynamicIslandBuilder(
+                          context,
+                          logoConstraints,
+                        ),
+                      ),
                   },
                 ),
               ),
