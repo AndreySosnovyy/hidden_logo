@@ -122,23 +122,28 @@ class IosHiddenLogoUtil {
       _IPhone.xsMax => const BoxConstraints(maxHeight: 30.0, maxWidth: 209.0),
       _IPhone._11 => const BoxConstraints(maxHeight: 33.0, maxWidth: 230.0),
       _IPhone._11Pro => const BoxConstraints(maxHeight: 30.0, maxWidth: 209.0),
-      _IPhone._11ProMax => const BoxConstraints(maxHeight: 30.0, maxWidth: 209.0),
+      _IPhone._11ProMax =>
+        const BoxConstraints(maxHeight: 30.0, maxWidth: 209.0),
       _IPhone._12 => const BoxConstraints(maxHeight: 32.2, maxWidth: 211.0),
       _IPhone._12Mini => const BoxConstraints(maxHeight: 34.7, maxWidth: 226.0),
       _IPhone._12Pro => const BoxConstraints(maxHeight: 32.2, maxWidth: 211.0),
-      _IPhone._12ProMax => const BoxConstraints(maxHeight: 32.2, maxWidth: 211.0),
+      _IPhone._12ProMax =>
+        const BoxConstraints(maxHeight: 32.2, maxWidth: 211.0),
       _IPhone._13 => const BoxConstraints(maxHeight: 33.0, maxWidth: 162.0),
       _IPhone._13Mini => const BoxConstraints(maxHeight: 37.4, maxWidth: 175.0),
       _IPhone._13Pro => const BoxConstraints(maxHeight: 33.0, maxWidth: 162.0),
-      _IPhone._13ProMax => const BoxConstraints(maxHeight: 33.0, maxWidth: 162.0),
+      _IPhone._13ProMax =>
+        const BoxConstraints(maxHeight: 33.0, maxWidth: 162.0),
       _IPhone._14 => const BoxConstraints(maxHeight: 33.0, maxWidth: 162.0),
       _IPhone._14Plus => const BoxConstraints(maxHeight: 33.0, maxWidth: 162.0),
       _IPhone._14Pro => const BoxConstraints(maxHeight: 36.6, maxWidth: 125.0),
-      _IPhone._14ProMax => const BoxConstraints(maxHeight: 36.6, maxWidth: 125.0),
+      _IPhone._14ProMax =>
+        const BoxConstraints(maxHeight: 36.6, maxWidth: 125.0),
       _IPhone._15 => const BoxConstraints(maxHeight: 36.6, maxWidth: 125.0),
       _IPhone._15Plus => const BoxConstraints(maxHeight: 36.6, maxWidth: 125.0),
       _IPhone._15Pro => const BoxConstraints(maxHeight: 36.6, maxWidth: 125.0),
-      _IPhone._15ProMax => const BoxConstraints(maxHeight: 36.6, maxWidth: 125.0),
+      _IPhone._15ProMax =>
+        const BoxConstraints(maxHeight: 36.6, maxWidth: 125.0),
       _ => const BoxConstraints(maxHeight: 36.6, maxWidth: 125.0),
     };
   }

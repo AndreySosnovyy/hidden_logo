@@ -3,7 +3,7 @@
 The package allows you to add hidden logo under the Notch or the Dynamic Island for iPhone devices.
 
 
-![readme_welcome_image.png](readme_welcome_image.png)
+![readme_welcome_image.png](https://github.com/AndreySosnovyy/hidden_logo/blob/main/readme_welcome_image.png)
 
 ❗Using this package will **NOT** affect your application running on any other 
 platforms except iOS. Also, it will not affect your app running on the 
