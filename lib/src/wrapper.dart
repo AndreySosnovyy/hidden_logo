@@ -26,7 +26,6 @@ class HiddenLogo extends StatefulWidget {
   });
 
   /// Your widget to be wrapped (usually MaterialApp or CupertinoApp)
-
   final Widget body;
 
   /// What would you like to see behind iPhone's notch
