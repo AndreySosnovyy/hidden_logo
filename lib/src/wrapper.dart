@@ -1,6 +1,6 @@
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:hidden_logo/src/util.dart';
+import 'package:hidden_logo/src/parser.dart';
 
 typedef LogoBuilder = Widget Function(
   BuildContext context,
@@ -22,8 +22,8 @@ class HiddenLogo extends StatefulWidget {
     required this.dynamicIslandBuilder,
     this.showType = LogoShowType.always,
     this.isShown = true,
-    super.key,
-  });
+    Key? key,
+  }) : super(key: key);
 
   /// Your widget to be wrapped (usually MaterialApp or CupertinoApp)
   final Widget body;
@@ -60,11 +60,13 @@ class _HiddenLogoState extends State<HiddenLogo> with WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.resumed:
         _isForeground = true;
+        break;
       case AppLifecycleState.inactive:
       case AppLifecycleState.detached:
       case AppLifecycleState.hidden:
       case AppLifecycleState.paused:
         _isForeground = false;
+        break;
     }
     super.didChangeAppLifecycleState(state);
     setState(() {});
@@ -72,46 +74,54 @@ class _HiddenLogoState extends State<HiddenLogo> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: DeviceInfoPlugin().deviceInfo,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData || snapshot.hasError || snapshot.data == null) {
-          return const SizedBox.shrink();
-        }
-        final notchUtil = IosHiddenLogoUtil(deviceInfo: snapshot.data!);
-        final logoConstraints = notchUtil.logoConstraints;
-        return Stack(
-          children: [
-            widget.body,
-            if (notchUtil.isTargetDevice &&
-                widget.isShown &&
-                (widget.showType == LogoShowType.always
-                    ? true
-                    : !_isForeground))
-              Align(
-                alignment: Alignment.topCenter,
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    top: notchUtil.dynamicIslandTopMargin,
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        if (orientation == Orientation.landscape) return widget.body;
+        return FutureBuilder(
+          future: DeviceInfoPlugin().deviceInfo,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData ||
+                snapshot.hasError ||
+                snapshot.data == null) {
+              return const SizedBox.shrink();
+            }
+            assert(snapshot.data is BaseDeviceInfo);
+            final parser =
+                HiddenLogoParser(deviceInfo: snapshot.data! as BaseDeviceInfo);
+            final constraints = parser.logoConstraints;
+            return Stack(
+              children: [
+                widget.body,
+                if (parser.isTargetDevice &&
+                    widget.isShown &&
+                    (widget.showType == LogoShowType.always
+                        ? true
+                        : !_isForeground))
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        top: parser.dynamicIslandTopMargin,
+                      ),
+                      child: parser.logoType == LogoType.notch
+                          ? widget.notchBuilder(
+                              context,
+                              constraints,
+                            )
+                          : ClipRRect(
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(100.0),
+                              ),
+                              child: widget.dynamicIslandBuilder(
+                                context,
+                                constraints,
+                              ),
+                            ),
+                    ),
                   ),
-                  child: switch (notchUtil.logoType) {
-                    LogoType.notch => widget.notchBuilder(
-                        context,
-                        logoConstraints,
-                      ),
-                    LogoType.dynamicIsland => ClipRRect(
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(18.0),
-                        ),
-                        child: widget.dynamicIslandBuilder(
-                          context,
-                          logoConstraints,
-                        ),
-                      ),
-                  },
-                ),
-              ),
-          ],
+              ],
+            );
+          },
         );
       },
     );

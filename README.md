@@ -1,21 +1,30 @@
 ## Features
 
-The package allows you to add hidden logo under the Notch or the Dynamic Island for iPhone devices.
-
+The **hidden_logo** package allows you to add any Flutter widget under the Notch or
+the Dynamic Island for iPhones. It can be your brand logo or its simplified version.
+They will only be visible for users in certain scenarios, for example when user
+takes a screenshot of your app, minimizes it or uses some kind of screen mirroring.
 
 ![readme_welcome_image.png](readme_welcome_image.png)
 
-❗Using this package will **NOT** affect your application running on any other 
-platforms except iOS. Also, it will not affect your app running on the 
-iPhones that is not marked as the Target ones 
-(See the [List of Target iPhones](#table-of-iphones-hardware-top-barrier-types-target-iphones) 
-in the table down below).
+❗No additional checks or manually written conditions are required when using `HiddenLogo`:</br>
+
+- **Application running on any other devices not marked as target ones will not be
+  affected**. Currently, the list of target devices only contains all iPhones starting
+  from iPhone X all the way up to iPhone 16 series. </br>
+  You can see the [List of Target iPhones](#iphones-hardware-barrier-types-target-devices) separated by hardware barrier
+  type
+  (Notch or Dynamic Island) in the table down below.
+- It provides **precise size constraints for every iPhone**. So you don't need to
+  be worried about the size of your child widget.
+- Corners of your Dynamic Island widget will be **rounded automatically**.
+- Your child widget will only be visible in **portrait mode**.
 
 ## Usage
 
-Wrap your `MaterialApp` or `CupertinoApp` with `HiddenLogo` widget or define 
-its `builder` function (as in the example). Then you have to provide 2 builders
-for 2 cases: iPhones with Notch and the ones with Dynamic Island.
+Wrap your `MaterialApp` or `CupertinoApp` with `HiddenLogo` widget or define
+its `builder` function. Then you have to provide 2 builders for 2 cases:
+iPhones with Notch and the ones with Dynamic Island.
 
 ```dart
 @override
@@ -36,56 +45,71 @@ Widget build(BuildContext context) {
 }
 ```
 
-The size of your brand logo can be adaptive thanks to constraints provided 
-by the widget. They define `maxWidth`
-and `maxHeight` where you can draw and remain hidden.<br>
-Also do not forget to define `BorderRadius` property for your Notch logo widget to make it look prettier! And the Dynamic Island widget will be rounded automatically.
+The size of your brand logo can be adaptive thanks to constraints provided
+by the widget. They define `maxWidth` and `maxHeight` where you can draw and remain hidden.<br>
+All the existing iPhone variants starting from iPhone X are tested, so the widget
+always returns correct max constraints!
 
-## Common mistakes
-
-- Don't place kinky visual trash (especially adds) but only your brand or 
-application logo. Obviously, doing opposite may cause troubles with releasing
-your app to the store
-- Round your widget's barriers, so it nicely fits hardware barrier and 
-non-visible when not need to be
+Also do not forget to define `BorderRadius` property for your Notch logo widget,
+so it nicely fits under the hardware barrier and non-visible when not intended to.</br>
 
 ## Additional information
 
-You do not have to worry - all the existing iPhone variants starting from 
-iPhone X are tested, so the widget always return correct max constraints!
+### Recommendations and tips
 
-To test visual appearance of your widget when developing you can either 
-minimize your app to tray or take a screenshot of your app (for ios 
-simulator: Device → Trigger Screenshot)
+❌ Do not place kinky visual trash (especially adds) but only your brand or
+application logo. Doing opposite may cause troubles with releasing
+your app to the store.
 
-### Table of iPhones hardware top barrier types (Target iPhones)
+❌ Do not place any important or sensitive information in `HiddenLogo` widget.
+Assume that user don't even see your widget there.
 
-| iPhones with Notch | iPhones with Dynamic Island |
-|:-------------------|:----------------------------|
-| X                  | 14 Pro                      |
-| XR                 | 14 Pro Max                  |
-| XS                 | 15                          |
-| XS Max             | 15 Plus                     |
-| 11                 | 15 Pro                      |
-| 11 Pro             | 15 Pro Max                  |
-| 11 Pro Max         |                             |
-| 12                 |                             |
-| 12 Mini            |                             |
-| 12 Pro             |                             |
-| 12 Pro Max         |                             |
-| 13                 |                             |
-| 13 Mini            |                             |
-| 13 Pro             |                             |
-| 13 Pro Max         |                             |
-| 14                 |                             |
-| 14 Plus            |                             |
+❌ Do not set any on tap callbacks for your widgets that you place under
+the hardware barriers. User will not be able to click there.
 
-### About further updates
+❌ Do not use `HiddenLogo` widget if top of the screen in your app already
+have many details in app bars. Doing opposite will make it look even more overloaded.
 
-When the new iPhones will come out the logos will not appear on them 
-because the actual shape and size configuration of
-further devices are unknown in advance!<br>
-But the package will be updated as soon as possible after the release!
+✅ Hide your HiddenLogo widget while splashscreen is displayed. You can achieve this
+by setting `isShown` property to `false` in `HiddenLogo` widget.
 
-**Any Issues or Pull requests are appreciated!**<br>
-**Thanks!**
+✅ If your brand's logo is complicated and have many small details you may want to
+use simplified version. Or just display its name.
+
+✅ Feel free to slightly animate your child widget if needed. But don't overdo it!
+
+### Debugging
+
+To test visual appearance of your widget when developing you can either
+minimize your app or take a screenshot of your app (for ios simulator:
+Device → Trigger Screenshot)
+
+### iPhones hardware barrier types (Target devices)
+
+| Notch      | Dynamic Island |
+|:-----------|:---------------|
+| X          | 14 Pro         |
+| XR         | 14 Pro Max     |
+| XS         | 15             |
+| XS Max     | 15 Plus        |
+| 11         | 15 Pro         |
+| 11 Pro     | 15 Pro Max     |
+| 11 Pro Max | 16             |
+| 12         | 16 Plus        |
+| 12 Mini    | 16 Pro         |
+| 12 Pro     | 16 Pro Max     |
+| 12 Pro Max |                |
+| 13         |                |
+| 13 Mini    |                |
+| 13 Pro     |                |
+| 13 Pro Max |                |
+| 14         |                |
+| 14 Plus    |                |
+
+---
+
+## About new devices support
+
+When the new iPhones are released, your logos won't appear on their screens because
+the actual shape and size configuration of further devices are unknown in advance.
+But the package will be updated as soon as possible when all necessary SDKs are available!
