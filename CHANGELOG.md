@@ -1,3 +1,9 @@
+## 0.0.6
+
+* Update README
+* Fix black screen in case device_info_plus plugin fails
+* Update analysis rules and add documentation
+
 ## 0.0.5
 
 * Add support for new iPhones: 16, 16 Plus, 16 Pro, 16 Pro Max

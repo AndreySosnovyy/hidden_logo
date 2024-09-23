@@ -7,14 +7,18 @@ takes a screenshot of your app, minimizes it or uses some kind of screen mirrori
 
 ![readme_welcome_image.png](readme_welcome_image.png)
 
+<p align="left">
+<a href="https://pub.dev/packages/hidden_logo"><img src="https://img.shields.io/pub/v/hidden_logo.svg?style=flat&colorB=blue" alt="Pub"></a>
+<a href="https://github.com/AndreySosnovyy/hidden_logo"><img src="https://img.shields.io/github/stars/andreysosnovyy/hidden_logo.svg?&style=flat&logo=github&color=red&label=stars" alt="Star on Github"></a>
+</p>
+
 ❗No additional checks or manually written conditions are required when using `HiddenLogo`:</br>
 
 - **Application running on any other devices not marked as target ones will not be
   affected**. Currently, the list of target devices only contains all iPhones starting
   from iPhone X all the way up to iPhone 16 series. </br>
   You can see the [List of Target iPhones](#iphones-hardware-barrier-types-target-devices) separated by hardware barrier
-  type
-  (Notch or Dynamic Island) in the table down below.
+  type (Notch or Dynamic Island) in the table down below.
 - It provides **precise size constraints for every iPhone**. So you don't need to
   be worried about the size of your child widget.
 - Corners of your Dynamic Island widget will be **rounded automatically**.
@@ -106,10 +110,18 @@ Device → Trigger Screenshot)
 | 14         |                |
 | 14 Plus    |                |
 
----
-
 ## About new devices support
 
 When the new iPhones are released, your logos won't appear on their screens because
 the actual shape and size configuration of further devices are unknown in advance.
 But the package will be updated as soon as possible when all necessary SDKs are available!
+
+### Contribute 🛠
+
+You can also contribute to this package in [GitHub](https://github.com/AndreySosnovyy/hidden_logo). </br>
+Suggest your ideas or bug reports by opening an [issue](https://github.com/AndreySosnovyy/hidden_logo/issues/new) or
+creating [pull request](https://github.com/AndreySosnovyy/hidden_logo/pulls).
+ </br>
+ </br>
+ </br>
+
