@@ -15,7 +15,7 @@ class ExampleDynamicIslandBrandLogo extends StatelessWidget {
     return Container(
       width: width,
       height: height,
-      decoration: const BoxDecoration(color: Colors.red),
+      color: Colors.red,
       child: Center(
         child: Text(
           'BRAND LOGO',

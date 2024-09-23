@@ -2,11 +2,13 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:hidden_logo/src/parser.dart';
 
+/// Logo builder function
 typedef LogoBuilder = Widget Function(
   BuildContext context,
   BoxConstraints constraints,
 );
 
+/// Determines when to show your logo
 enum LogoShowType {
   /// Always show the logo
   always,
@@ -15,7 +17,13 @@ enum LogoShowType {
   onlyInBackground,
 }
 
+/// {@template hidden_logo.HiddenLogo}
+/// Hidden Logo widget wrapper. It wraps body widget and displays
+/// widget built via provided functions on top of the screen where it it
+/// not visible under the physical hardware barrier.
+/// {@endtemplate}
 class HiddenLogo extends StatefulWidget {
+  /// {@macro hidden_logo.HiddenLogo}
   const HiddenLogo({
     required this.body,
     required this.notchBuilder,
@@ -83,9 +91,8 @@ class _HiddenLogoState extends State<HiddenLogo> with WidgetsBindingObserver {
             if (!snapshot.hasData ||
                 snapshot.hasError ||
                 snapshot.data == null) {
-              return const SizedBox.shrink();
+              return widget.body;
             }
-            assert(snapshot.data is BaseDeviceInfo);
             final parser =
                 HiddenLogoParser(deviceInfo: snapshot.data! as BaseDeviceInfo);
             final constraints = parser.logoConstraints;

@@ -1,5 +1,5 @@
-import 'package:example/example_dynamic_island_logo.dart';
-import 'package:example/example_notch_logo.dart';
+import 'package:example/dynamic_island_logo.dart';
+import 'package:example/notch_logo.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hidden_logo/hidden_logo.dart';
 

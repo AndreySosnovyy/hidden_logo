@@ -5,46 +5,113 @@ import 'package:flutter/widgets.dart';
 
 /// Possible locations of the brand logo hidden behind
 /// iPhone's hardware barriers
-enum LogoType { notch, dynamicIsland }
+enum LogoType {
+  /// Hardware barrier for iPhones from iPhone X to iPhone 14 Plus
+  notch,
+
+  /// Hardware barrier for iPhones from iPhone 14 Pro
+  dynamicIsland,
+}
 
 ///  Target iPhones: the ones with notch or dynamic island only
 enum DeviceModel {
+  /// iPhone X
   iPhoneX,
+
+  /// iPhone XR
   iPhoneXr,
+
+  /// iPhone XS
   iPhoneXs,
+
+  /// iPhone XS Max
   iPhoneXsMax,
+
+  /// iPhone 11
   iPhone11,
+
+  /// iPhone 11 Pro
   iPhone11Pro,
+
+  /// iPhone 11 Pro Max
   iPhone11ProMax,
+
+  /// iPhone 12
   iPhone12,
+
+  /// iPhone 12 Mini
   iPhone12Mini,
+
+  /// iPhone 12 Pro
   iPhone12Pro,
+
+  /// iPhone 12 Pro Max
   iPhone12ProMax,
+
+  /// iPhone 13
   iPhone13,
+
+  /// iPhone 13 Mini
   iPhone13Mini,
+
+  /// iPhone 13 Pro
   iPhone13Pro,
+
+  /// iPhone 13 Pro Max
   iPhone13ProMax,
+
+  /// iPhone 14
   iPhone14,
+
+  /// iPhone 14 Plus
   iPhone14Plus,
+
+  /// iPhone 14 Pro
   iPhone14Pro,
+
+  /// iPhone 14 Pro Max
   iPhone14ProMax,
+
+  /// iPhone 15
   iPhone15,
+
+  /// iPhone 15 Plus
   iPhone15Plus,
+
+  /// iPhone 15 Pro
   iPhone15Pro,
+
+  /// iPhone 15 Pro Max
   iPhone15ProMax,
+
+  /// iPhone 16
   iPhone16,
+
+  /// iPhone 16 Plus
   iPhone16Plus,
+
+  /// iPhone 16 Pro
   iPhone16Pro,
+
+  /// iPhone 16 Pro Max
   iPhone16ProMax,
 }
 
+/// {@template hidden_logo.HiddenLogoParser}
+/// Class that parses device information and provides information on how to
+/// display child widget for HiddenLogo for current device.
+/// {@endtemplate}
 class HiddenLogoParser {
+  /// {@macro hidden_logo.HiddenLogoParser}
   const HiddenLogoParser({required this.deviceInfo});
 
+  /// Information about current device provided by DeviceInfoPlugin
   final BaseDeviceInfo deviceInfo;
 
+  /// Returns true if current device is one of target iPhones
   bool get isTargetIPhone => currentIPhone != null;
 
+  /// Returns type of current iPhone's hardware barrier
   LogoType get logoType {
     assert(isTargetIPhone);
     switch (currentIPhone) {
@@ -64,6 +131,7 @@ class HiddenLogoParser {
     }
   }
 
+  /// Returns current iPhone model or null for non target device
   DeviceModel? get currentIPhone {
     final deviceName = deviceInfo.data['utsname']['machine'];
     if (deviceName.isEmpty) return null;
