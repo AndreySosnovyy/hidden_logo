@@ -30,8 +30,8 @@ class HiddenLogo extends StatefulWidget {
     required this.dynamicIslandBuilder,
     this.showType = LogoShowType.always,
     this.isShown = true,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   /// Your widget to be wrapped (usually MaterialApp or CupertinoApp)
   final Widget body;

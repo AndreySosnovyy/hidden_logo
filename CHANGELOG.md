@@ -1,3 +1,8 @@
+## 0.0.7
+
+* Fix parsing issues
+* Migrate gradle in example
+
 ## 0.0.6
 
 * Update README
