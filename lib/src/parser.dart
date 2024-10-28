@@ -135,7 +135,7 @@ class HiddenLogoParser {
   DeviceModel? get currentIPhone {
     late final String deviceName;
     try {
-     deviceName = deviceInfo.data['utsname']['machine'];
+      deviceName = deviceInfo.data['utsname']['machine'];
     } on Object {
       return null;
     }
