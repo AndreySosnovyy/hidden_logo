@@ -1,3 +1,7 @@
+## 0.0.7+1
+
+* Fix analysis issues
+
 ## 0.0.7
 
 * Fix parsing issues
