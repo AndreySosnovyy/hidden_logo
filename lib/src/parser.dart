@@ -133,7 +133,12 @@ class HiddenLogoParser {
 
   /// Returns current iPhone model or null for non target device
   DeviceModel? get currentIPhone {
-    final deviceName = deviceInfo.data['utsname']['machine'];
+    late final String deviceName;
+    try {
+     deviceName = deviceInfo.data['utsname']['machine'];
+    } on Object {
+      return null;
+    }
     if (deviceName.isEmpty) return null;
     final deviceCode = deviceName.substring('iPhone'.length);
     switch (deviceCode) {
