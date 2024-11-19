@@ -250,10 +250,10 @@ class HiddenLogoParser {
       case DeviceModel.iPhone15ProMax:
       case DeviceModel.iPhone16:
       case DeviceModel.iPhone16Plus:
-        return const BoxConstraints(maxHeight: 36.6, maxWidth: 125.0);
+        return const BoxConstraints(maxHeight: 36.7, maxWidth: 122.0);
       case DeviceModel.iPhone16Pro:
       case DeviceModel.iPhone16ProMax:
-        return const BoxConstraints(maxHeight: 37.2, maxWidth: 125.6);
+        return const BoxConstraints(maxHeight: 37.0, maxWidth: 122.0);
       case null:
         return const BoxConstraints(maxHeight: 0, maxWidth: 0);
     }
@@ -270,10 +270,10 @@ class HiddenLogoParser {
       case DeviceModel.iPhone15ProMax:
       case DeviceModel.iPhone16:
       case DeviceModel.iPhone16Plus:
-        return 11.4;
+        return 11.3;
       case DeviceModel.iPhone16Pro:
       case DeviceModel.iPhone16ProMax:
-        return 13.8;
+        return 14.0;
       default:
         return 0.0;
     }
