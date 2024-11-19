@@ -1,3 +1,7 @@
+## 0.0.8
+
+* Adjust Dynamic Island logo constraints
+
 ## 0.0.7+1
 
 * Fix analysis issues

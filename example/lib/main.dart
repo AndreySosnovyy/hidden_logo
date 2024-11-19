@@ -33,7 +33,13 @@ class App extends StatelessWidget {
         );
       },
       home: const CupertinoPageScaffold(
-        navigationBar: CupertinoNavigationBar(middle: Text('App Bar')),
+        navigationBar: CupertinoNavigationBar(
+          backgroundColor: CupertinoColors.black,
+          middle: Text(
+            'App Bar',
+            style: TextStyle(color: CupertinoColors.white),
+          ),
+        ),
         child: SizedBox(),
       ),
     );
