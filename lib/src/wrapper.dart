@@ -1,6 +1,7 @@
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:hidden_logo/src/base.dart';
+import 'package:hidden_logo/src/parser.dart';
 
 /// Logo builder function
 typedef LogoBuilder = Widget Function(
@@ -59,6 +60,7 @@ class HiddenLogo extends StatelessWidget {
       visibilityMode: visibilityMode,
       isVisible: isVisible,
       deviceInfoPlugin: DeviceInfoPlugin(),
+      parser: HiddenLogoParser(),
     );
   }
 }

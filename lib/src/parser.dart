@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
@@ -103,10 +104,31 @@ enum DeviceModel {
 /// {@endtemplate}
 class HiddenLogoParser {
   /// {@macro hidden_logo.HiddenLogoParser}
-  const HiddenLogoParser({required this.deviceInfo});
+  HiddenLogoParser({
+    BaseDeviceInfo? deviceInfo,
+  }) {
+    if (deviceInfo != null) {
+      _deviceInfo = deviceInfo;
+      _deviceInfoInitializationCompleter.complete();
+    }
+  }
 
   /// Information about current device provided by DeviceInfoPlugin
-  final BaseDeviceInfo deviceInfo;
+  late final BaseDeviceInfo _deviceInfo;
+  final _deviceInfoInitializationCompleter = Completer<void>();
+
+  set deviceInfo(BaseDeviceInfo value) {
+    if (_deviceInfoInitializationCompleter.isCompleted) return;
+    _deviceInfo = value;
+    _deviceInfoInitializationCompleter.complete();
+  }
+
+  void _verifyDeviceInfoInitialized() {
+    if (!_deviceInfoInitializationCompleter.isCompleted) {
+      throw StateError(
+          'HiddenLogoParser\'s _deviceInfo property is not initialized, set it first!');
+    }
+  }
 
   /// Returns true if current device is one of target iPhones
   bool get isTargetIPhone => currentIPhone != null;
@@ -133,10 +155,11 @@ class HiddenLogoParser {
 
   /// Returns current iPhone model or null for non target device
   DeviceModel? get currentIPhone {
+    _verifyDeviceInfoInitialized();
     late final String deviceName;
     late final String deviceCode;
     try {
-      deviceName = deviceInfo.data['utsname']['machine'];
+      deviceName = _deviceInfo.data['utsname']['machine'];
       deviceCode = deviceName.substring('iPhone'.length);
     } on Object {
       return null;

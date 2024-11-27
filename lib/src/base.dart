@@ -6,13 +6,6 @@ import 'package:hidden_logo/src/parser.dart';
 import 'package:hidden_logo/src/wrapper.dart';
 
 class HiddenLogoBase extends StatefulWidget {
-  final Widget body;
-  final LogoBuilder notchBuilder;
-  final LogoBuilder dynamicIslandBuilder;
-  final LogoVisibilityMode visibilityMode;
-  final bool isVisible;
-  final DeviceInfoPlugin? deviceInfoPlugin;
-
   const HiddenLogoBase({
     required this.body,
     required this.notchBuilder,
@@ -20,8 +13,17 @@ class HiddenLogoBase extends StatefulWidget {
     required this.visibilityMode,
     required this.isVisible,
     required this.deviceInfoPlugin,
+    required this.parser,
     super.key,
   });
+
+  final Widget body;
+  final LogoBuilder notchBuilder;
+  final LogoBuilder dynamicIslandBuilder;
+  final LogoVisibilityMode visibilityMode;
+  final bool isVisible;
+  final DeviceInfoPlugin deviceInfoPlugin;
+  final HiddenLogoParser parser;
 
   @override
   State<HiddenLogoBase> createState() => _HiddenLogoBaseState();
@@ -59,21 +61,20 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
     return OrientationBuilder(
       builder: (context, orientation) {
         if (orientation == Orientation.landscape) return widget.body;
-        return FutureBuilder(
-          future: (widget.deviceInfoPlugin ?? DeviceInfoPlugin()).deviceInfo,
+        return FutureBuilder<BaseDeviceInfo>(
+          future: widget.deviceInfoPlugin.deviceInfo,
           builder: (context, snapshot) {
             if (!snapshot.hasData ||
                 snapshot.hasError ||
                 snapshot.data == null) {
               return widget.body;
             }
-            final parser =
-                HiddenLogoParser(deviceInfo: snapshot.data! as BaseDeviceInfo);
-            final constraints = parser.logoConstraints;
+            widget.parser.deviceInfo = snapshot.data!;
+            final constraints = widget.parser.logoConstraints;
             return Stack(
               children: [
                 widget.body,
-                if (parser.isTargetDevice &&
+                if (widget.parser.isTargetDevice &&
                     widget.isVisible &&
                     (widget.visibilityMode == LogoVisibilityMode.always
                         ? true
@@ -82,9 +83,9 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
                     alignment: Alignment.topCenter,
                     child: Padding(
                       padding: EdgeInsets.only(
-                        top: parser.dynamicIslandTopMargin,
+                        top: widget.parser.dynamicIslandTopMargin,
                       ),
-                      child: parser.logoType == LogoType.notch
+                      child: widget.parser.logoType == LogoType.notch
                           ? widget.notchBuilder(
                               context,
                               constraints,
