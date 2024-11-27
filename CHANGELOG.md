@@ -1,8 +1,18 @@
-## 0.0.9
+## 0.1.0
+
+**BREAKING!**
+
+* Rename `isShown` → `isVisible`
+* Rename `showType` → `visibilityMode`
+* Rename `LogoShowType` → `LogoVisibilityMode`
+
+ ---
 
 * Add parser and wrapper tests
-* Update device_info_plus dependency
-* Fix parsing issues
+* Update device_info_plus dependency version
+* Fix minor parsing issue
+* Refactor internals 
+* Update README
 
 ## 0.0.8
 

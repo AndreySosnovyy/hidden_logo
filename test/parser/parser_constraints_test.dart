@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hidden_logo/src/parser.dart';
 import 'package:mocktail/mocktail.dart';
 
-import '../parsing_utils.dart';
+import 'parsing_utils.dart';
 
 class MockBaseDeviceInfo extends Mock implements BaseDeviceInfo {}
 
