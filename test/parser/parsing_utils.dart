@@ -61,6 +61,7 @@ class IPhoneParsingUtil {
         return '17,1';
       case DeviceModel.iPhone16ProMax:
         return '17,2';
+      // Add new cases when new iPhones are released
     }
   }
 }
