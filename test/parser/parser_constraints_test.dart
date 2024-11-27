@@ -69,4 +69,53 @@ void main() {
           const BoxConstraints(maxHeight: 0, maxWidth: 0));
     });
   });
+
+  group('Get dynamic island logo top margin from parser', () {
+    void testTopMarginParsing(
+      DeviceModel iPhone,
+      double expectedMargin,
+    ) {
+      test(
+          'When device is ${iPhone.name}, '
+          'top margin should be $expectedMargin', () {
+        when(() => mockBaseDeviceInfo.data).thenReturn(
+            IPhoneParsingUtil.buildMockDeviceInfoDataMap(
+                'iPhone${IPhoneParsingUtil.iPhoneToCode(iPhone)}'));
+        expect(parser.dynamicIslandTopMargin, expectedMargin);
+      });
+    }
+
+    testTopMarginParsing(DeviceModel.iPhoneX, 0);
+    testTopMarginParsing(DeviceModel.iPhoneXr, 0);
+    testTopMarginParsing(DeviceModel.iPhoneXs, 0);
+    testTopMarginParsing(DeviceModel.iPhoneXsMax, 0);
+    testTopMarginParsing(DeviceModel.iPhone11, 0);
+    testTopMarginParsing(DeviceModel.iPhone11Pro, 0);
+    testTopMarginParsing(DeviceModel.iPhone11ProMax, 0);
+    testTopMarginParsing(DeviceModel.iPhone12, 0);
+    testTopMarginParsing(DeviceModel.iPhone12Mini, 0);
+    testTopMarginParsing(DeviceModel.iPhone12Pro, 0);
+    testTopMarginParsing(DeviceModel.iPhone12ProMax, 0);
+    testTopMarginParsing(DeviceModel.iPhone13, 0);
+    testTopMarginParsing(DeviceModel.iPhone13Mini, 0);
+    testTopMarginParsing(DeviceModel.iPhone13Pro, 0);
+    testTopMarginParsing(DeviceModel.iPhone13ProMax, 0);
+    testTopMarginParsing(DeviceModel.iPhone14, 0);
+    testTopMarginParsing(DeviceModel.iPhone14Plus, 0);
+    testTopMarginParsing(DeviceModel.iPhone14Pro, 11.3);
+    testTopMarginParsing(DeviceModel.iPhone14ProMax, 11.3);
+    testTopMarginParsing(DeviceModel.iPhone15, 11.3);
+    testTopMarginParsing(DeviceModel.iPhone15Pro, 11.3);
+    testTopMarginParsing(DeviceModel.iPhone15Plus, 11.3);
+    testTopMarginParsing(DeviceModel.iPhone15ProMax, 11.3);
+    testTopMarginParsing(DeviceModel.iPhone16, 11.3);
+    testTopMarginParsing(DeviceModel.iPhone16Plus, 11.3);
+    testTopMarginParsing(DeviceModel.iPhone16Pro, 14.0);
+    testTopMarginParsing(DeviceModel.iPhone16ProMax, 14.0);
+
+    test('Should return 0 top margin if unable to parse iPhone', () {
+      when(() => parser.currentIPhone).thenReturn(null);
+      expect(parser.dynamicIslandTopMargin, 0);
+    });
+  });
 }
