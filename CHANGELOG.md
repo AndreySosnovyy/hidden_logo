@@ -1,3 +1,9 @@
+## 0.0.9
+
+* Add parser and wrapper tests
+* Update device_info_plus dependency
+* Fix parsing issues
+
 ## 0.0.8
 
 * Adjust Dynamic Island logo constraints
