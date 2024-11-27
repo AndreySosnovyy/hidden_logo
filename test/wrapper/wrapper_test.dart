@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hidden_logo/hidden_logo.dart';
+import 'package:hidden_logo/src/parser.dart';
+import 'package:mocktail/mocktail.dart';
+
+class MockHiddenLogoParser extends Mock implements HiddenLogoParser {}
 
 class EmptyAppWithHiddenLogo extends StatelessWidget {
   const EmptyAppWithHiddenLogo({
