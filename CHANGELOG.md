@@ -2,9 +2,9 @@
 
 **BREAKING!**
 
-* Rename `isShown` → `isVisible`
-* Rename `showType` → `visibilityMode`
-* Rename `LogoShowType` → `LogoVisibilityMode`
+* Rename parameter `isShown` → `isVisible`
+* Rename parameter `showType` → `visibilityMode`
+* Rename enum `LogoShowType` → `LogoVisibilityMode`
 
  ---
 

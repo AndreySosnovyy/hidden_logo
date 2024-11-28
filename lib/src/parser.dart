@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 /// Possible locations of the brand logo hidden behind
@@ -117,8 +117,14 @@ class HiddenLogoParser {
   late final BaseDeviceInfo _deviceInfo;
   final _deviceInfoInitializationCompleter = Completer<void>();
 
+  /// Returns true if _deviceInfo property is initialized
+  bool get isDeviceInfoSet => _deviceInfoInitializationCompleter.isCompleted;
+
   set deviceInfo(BaseDeviceInfo value) {
-    if (_deviceInfoInitializationCompleter.isCompleted) return;
+    if (_deviceInfoInitializationCompleter.isCompleted) {
+      throw StateError(
+          'HiddenLogoParser\'s _deviceInfo property is already initialized, set it only once!');
+    }
     _deviceInfo = value;
     _deviceInfoInitializationCompleter.complete();
   }
@@ -227,10 +233,10 @@ class HiddenLogoParser {
     }
   }
 
-  /// Returns true if device is an iPhone and it has notch or
-  /// Dynamic Island on top
+  /// Returns true if device is an iPhone and it has notch or Dynamic Island on top
   bool get isTargetDevice {
-    if (Platform.isIOS && isTargetIPhone) return true;
+    final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
+    if (isIOS && isTargetIPhone) return true;
     return false;
   }
 

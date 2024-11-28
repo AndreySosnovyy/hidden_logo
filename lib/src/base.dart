@@ -69,16 +69,17 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
                 snapshot.data == null) {
               return widget.body;
             }
-            widget.parser.deviceInfo = snapshot.data!;
+            if (!widget.parser.isDeviceInfoSet) {
+              widget.parser.deviceInfo = snapshot.data!;
+            }
             final constraints = widget.parser.logoConstraints;
             return Stack(
               children: [
                 widget.body,
                 if (widget.parser.isTargetDevice &&
                     widget.isVisible &&
-                    (widget.visibilityMode == LogoVisibilityMode.always
-                        ? true
-                        : !_isForeground))
+                    (widget.visibilityMode == LogoVisibilityMode.always ||
+                        !_isForeground))
                   Align(
                     alignment: Alignment.topCenter,
                     child: Padding(
