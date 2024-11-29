@@ -15,28 +15,6 @@ class MockBaseDeviceInfo extends Mock implements BaseDeviceInfo {}
 
 class MockDeviceInfoPlugin extends Mock implements DeviceInfoPlugin {}
 
-class OrientatedBuilder extends StatelessWidget {
-  const OrientatedBuilder({
-    required this.orientation,
-    required this.builder,
-    super.key,
-  });
-
-  final Orientation orientation;
-  final Widget Function(BuildContext context) builder;
-
-  @override
-  Widget build(BuildContext context) {
-    return MediaQuery(
-      data: MediaQueryData.fromView(View.of(context)).copyWith(
-          size: orientation == Orientation.landscape
-              ? const Size(800.0, 600.0)
-              : const Size(600.0, 800.0)),
-      child: Builder(builder: (context) => builder(context)),
-    );
-  }
-}
-
 class EmptyAppWithHiddenLogo extends StatefulWidget {
   const EmptyAppWithHiddenLogo({
     this.parser,
