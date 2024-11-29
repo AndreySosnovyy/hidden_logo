@@ -1,6 +1,6 @@
 import 'package:hidden_logo/src/parser.dart';
 
-class IPhoneParsingUtil {
+class TestUtils {
   static Map<String, dynamic> buildMockDeviceInfoDataMap(dynamic code) => {
         'utsname': {'machine': code}
       };

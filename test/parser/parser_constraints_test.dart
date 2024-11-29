@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hidden_logo/src/parser.dart';
 import 'package:mocktail/mocktail.dart';
 
-import '../parsing_utils.dart';
+import '../utils.dart';
 
 class MockBaseDeviceInfo extends Mock implements BaseDeviceInfo {}
 
@@ -21,8 +21,8 @@ void main() {
           'When device is ${iPhone.name}, '
           'constraints should be $expectedConstraints', () {
         when(() => mockBaseDeviceInfo.data).thenReturn(
-            IPhoneParsingUtil.buildMockDeviceInfoDataMap(
-                'iPhone${IPhoneParsingUtil.iPhoneToCode(iPhone)}'));
+            TestUtils.buildMockDeviceInfoDataMap(
+                'iPhone${TestUtils.iPhoneToCode(iPhone)}'));
         expect(parser.logoConstraints, expectedConstraints);
       });
     }
@@ -79,8 +79,8 @@ void main() {
           'When device is ${iPhone.name}, '
           'top margin should be $expectedMargin', () {
         when(() => mockBaseDeviceInfo.data).thenReturn(
-            IPhoneParsingUtil.buildMockDeviceInfoDataMap(
-                'iPhone${IPhoneParsingUtil.iPhoneToCode(iPhone)}'));
+            TestUtils.buildMockDeviceInfoDataMap(
+                'iPhone${TestUtils.iPhoneToCode(iPhone)}'));
         expect(parser.dynamicIslandTopMargin, expectedMargin);
       });
     }

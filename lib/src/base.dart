@@ -31,11 +31,13 @@ class HiddenLogoBase extends StatefulWidget {
 
 class _HiddenLogoBaseState extends State<HiddenLogoBase>
     with WidgetsBindingObserver {
-  bool _isForeground = true;
+  late bool _isForeground;
 
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
+    _isForeground =
+        WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
     super.initState();
   }
 

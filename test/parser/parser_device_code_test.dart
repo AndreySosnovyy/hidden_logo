@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hidden_logo/src/parser.dart';
 import 'package:mocktail/mocktail.dart';
 
-import '../parsing_utils.dart';
+import '../utils.dart';
 
 class MockBaseDeviceInfo extends Mock implements BaseDeviceInfo {}
 
@@ -18,37 +18,37 @@ void main() {
     });
     test('Should return null if code is in unexpected format', () {
       when(() => mockBaseDeviceInfo.data)
-          .thenReturn(IPhoneParsingUtil.buildMockDeviceInfoDataMap('10,6'));
+          .thenReturn(TestUtils.buildMockDeviceInfoDataMap('10,6'));
       expect(parser.currentIPhone, null);
     });
     test('Should return null if code is empty', () {
       when(() => mockBaseDeviceInfo.data)
-          .thenReturn(IPhoneParsingUtil.buildMockDeviceInfoDataMap(''));
+          .thenReturn(TestUtils.buildMockDeviceInfoDataMap(''));
       expect(parser.currentIPhone, null);
     });
     test('Should return null if code is unknown', () {
       when(() => mockBaseDeviceInfo.data).thenReturn(
-          IPhoneParsingUtil.buildMockDeviceInfoDataMap('iPhone52,9'));
+          TestUtils.buildMockDeviceInfoDataMap('iPhone52,9'));
       expect(parser.currentIPhone, null);
     });
     test('Should return null if code has dot instead of comma', () {
       when(() => mockBaseDeviceInfo.data).thenReturn(
-          IPhoneParsingUtil.buildMockDeviceInfoDataMap('iPhone10.6'));
+          TestUtils.buildMockDeviceInfoDataMap('iPhone10.6'));
       expect(parser.currentIPhone, null);
     });
     test('Should return null if code is not full', () {
       when(() => mockBaseDeviceInfo.data)
-          .thenReturn(IPhoneParsingUtil.buildMockDeviceInfoDataMap('iPhone11'));
+          .thenReturn(TestUtils.buildMockDeviceInfoDataMap('iPhone11'));
       expect(parser.currentIPhone, null);
     });
     test('Should return null if code has a whitespace', () {
       when(() => mockBaseDeviceInfo.data).thenReturn(
-          IPhoneParsingUtil.buildMockDeviceInfoDataMap('iPhone 10,6'));
+          TestUtils.buildMockDeviceInfoDataMap('iPhone 10,6'));
       expect(parser.currentIPhone, null);
     });
     test('Should return null if code is not String', () {
       when(() => mockBaseDeviceInfo.data)
-          .thenReturn(IPhoneParsingUtil.buildMockDeviceInfoDataMap(10.6));
+          .thenReturn(TestUtils.buildMockDeviceInfoDataMap(10.6));
       expect(parser.currentIPhone, null);
     });
   });
@@ -57,7 +57,7 @@ void main() {
     void testCodeParsing(String deviceCode, DeviceModel expectedIphone) {
       test('Should return ${expectedIphone.name} when code is $deviceCode', () {
         when(() => mockBaseDeviceInfo.data).thenReturn(
-            IPhoneParsingUtil.buildMockDeviceInfoDataMap(deviceCode));
+            TestUtils.buildMockDeviceInfoDataMap(deviceCode));
         expect(parser.currentIPhone, expectedIphone);
       });
     }
