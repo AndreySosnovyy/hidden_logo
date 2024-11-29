@@ -134,7 +134,7 @@ void main() {
     testLogoTypeParsing(DeviceModel.iPhone16ProMax, LogoType.dynamicIsland);
     // Add more tests when new iPhones are released
 
-    test('Should return logo type equals to null when device is not supported',
+    test('Should return and assert error when device is not supported',
         () {
       when(() => mockBaseDeviceInfo.data).thenReturn({});
       expect(() => parser.iPhonesLogoType, throwsAssertionError);
