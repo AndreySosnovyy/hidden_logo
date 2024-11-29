@@ -40,7 +40,7 @@ class App extends StatelessWidget {
             style: TextStyle(color: CupertinoColors.white),
           ),
         ),
-        child: SizedBox(),
+        child: SizedBox.shrink(),
       ),
     );
   }

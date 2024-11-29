@@ -1,6 +1,7 @@
-import 'dart:io';
+import 'dart:async';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 /// Possible locations of the brand logo hidden behind
@@ -103,16 +104,36 @@ enum DeviceModel {
 /// {@endtemplate}
 class HiddenLogoParser {
   /// {@macro hidden_logo.HiddenLogoParser}
-  const HiddenLogoParser({required this.deviceInfo});
+  HiddenLogoParser({
+    BaseDeviceInfo? deviceInfo,
+  }) {
+    if (deviceInfo != null) {
+      _deviceInfo = deviceInfo;
+      _deviceInfoInitializationCompleter.complete();
+    }
+  }
 
   /// Information about current device provided by DeviceInfoPlugin
-  final BaseDeviceInfo deviceInfo;
+  late final BaseDeviceInfo _deviceInfo;
+  final _deviceInfoInitializationCompleter = Completer<void>();
+
+  /// Returns true if _deviceInfo property is initialized
+  bool get isDeviceInfoSet => _deviceInfoInitializationCompleter.isCompleted;
+
+  set deviceInfo(BaseDeviceInfo value) {
+    if (_deviceInfoInitializationCompleter.isCompleted) {
+      throw StateError(
+          'HiddenLogoParser\'s _deviceInfo property is already initialized, set it only once!');
+    }
+    _deviceInfo = value;
+    _deviceInfoInitializationCompleter.complete();
+  }
 
   /// Returns true if current device is one of target iPhones
   bool get isTargetIPhone => currentIPhone != null;
 
-  /// Returns type of current iPhone's hardware barrier
-  LogoType get logoType {
+  /// Returns type of current iPhone's hardware barrier or null for non target devices
+  LogoType get iPhonesLogoType {
     assert(isTargetIPhone);
     switch (currentIPhone) {
       case DeviceModel.iPhone14Pro:
@@ -133,14 +154,19 @@ class HiddenLogoParser {
 
   /// Returns current iPhone model or null for non target device
   DeviceModel? get currentIPhone {
+    if (!_deviceInfoInitializationCompleter.isCompleted) {
+      throw StateError(
+          'HiddenLogoParser\'s _deviceInfo property is not initialized, set it first!');
+    }
     late final String deviceName;
+    late final String deviceCode;
     try {
-      deviceName = deviceInfo.data['utsname']['machine'];
+      deviceName = _deviceInfo.data['utsname']['machine'];
+      deviceCode = deviceName.substring('iPhone'.length);
     } on Object {
       return null;
     }
-    if (deviceName.isEmpty) return null;
-    final deviceCode = deviceName.substring('iPhone'.length);
+    if (deviceName.isEmpty || deviceCode.isEmpty) return null;
     switch (deviceCode) {
       case '10,6':
         return DeviceModel.iPhoneX;
@@ -203,10 +229,10 @@ class HiddenLogoParser {
     }
   }
 
-  /// Returns true if device is an iPhone and it has notch or
-  /// Dynamic Island on top
+  /// Returns true if device is an iPhone and it has notch or Dynamic Island on top
   bool get isTargetDevice {
-    if (Platform.isIOS && isTargetIPhone) return true;
+    final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
+    if (isIOS && isTargetIPhone) return true;
     return false;
   }
 

@@ -1,3 +1,19 @@
+## 0.1.0
+
+**BREAKING!**
+
+* Rename parameter `isShown` → `isVisible`
+* Rename parameter `showType` → `visibilityMode`
+* Rename enum `LogoShowType` → `LogoVisibilityMode`
+
+ ---
+
+* Add parser and wrapper tests
+* Update device_info_plus dependency version
+* Fix minor parsing issue
+* Refactor internals 
+* Update README
+
 ## 0.0.8
 
 * Adjust Dynamic Island logo constraints

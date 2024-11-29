@@ -75,7 +75,10 @@ the hardware barriers. User will not be able to click there.
 have many details in app bars. Doing opposite will make it look even more overloaded.
 
 ✅ Hide your HiddenLogo widget while splashscreen is displayed. You can achieve this
-by setting `isShown` property to `false` in `HiddenLogo` widget.
+by setting `isVisible` property to `false` in `HiddenLogo` widget.
+
+✅ Set `visibilityMode` of your logo to **only visible in background** if you
+want to hide it for screenshots. But it still will be visible when app is minimized.
 
 ✅ If your brand's logo is complicated and have many small details you may want to
 use simplified version. Or just display its name.
@@ -121,7 +124,7 @@ But the package will be updated as soon as possible when all necessary SDKs are 
 You can also contribute to this package in [GitHub](https://github.com/AndreySosnovyy/hidden_logo). </br>
 Suggest your ideas or bug reports by opening an [issue](https://github.com/AndreySosnovyy/hidden_logo/issues/new) or
 creating [pull request](https://github.com/AndreySosnovyy/hidden_logo/pulls).
- </br>
- </br>
- </br>
+</br>
+</br>
+</br>
 
