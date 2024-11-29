@@ -27,13 +27,13 @@ void main() {
       expect(parser.currentIPhone, null);
     });
     test('Should return null if code is unknown', () {
-      when(() => mockBaseDeviceInfo.data).thenReturn(
-          TestUtils.buildMockDeviceInfoDataMap('iPhone52,9'));
+      when(() => mockBaseDeviceInfo.data)
+          .thenReturn(TestUtils.buildMockDeviceInfoDataMap('iPhone52,9'));
       expect(parser.currentIPhone, null);
     });
     test('Should return null if code has dot instead of comma', () {
-      when(() => mockBaseDeviceInfo.data).thenReturn(
-          TestUtils.buildMockDeviceInfoDataMap('iPhone10.6'));
+      when(() => mockBaseDeviceInfo.data)
+          .thenReturn(TestUtils.buildMockDeviceInfoDataMap('iPhone10.6'));
       expect(parser.currentIPhone, null);
     });
     test('Should return null if code is not full', () {
@@ -42,8 +42,8 @@ void main() {
       expect(parser.currentIPhone, null);
     });
     test('Should return null if code has a whitespace', () {
-      when(() => mockBaseDeviceInfo.data).thenReturn(
-          TestUtils.buildMockDeviceInfoDataMap('iPhone 10,6'));
+      when(() => mockBaseDeviceInfo.data)
+          .thenReturn(TestUtils.buildMockDeviceInfoDataMap('iPhone 10,6'));
       expect(parser.currentIPhone, null);
     });
     test('Should return null if code is not String', () {
@@ -56,8 +56,8 @@ void main() {
   group('Get iPhones from codes provided by DeviceInfo', () {
     void testCodeParsing(String deviceCode, DeviceModel expectedIphone) {
       test('Should return ${expectedIphone.name} when code is $deviceCode', () {
-        when(() => mockBaseDeviceInfo.data).thenReturn(
-            TestUtils.buildMockDeviceInfoDataMap(deviceCode));
+        when(() => mockBaseDeviceInfo.data)
+            .thenReturn(TestUtils.buildMockDeviceInfoDataMap(deviceCode));
         expect(parser.currentIPhone, expectedIphone);
       });
     }
@@ -95,12 +95,13 @@ void main() {
 
   group('Logo types for iPhones', () {
     void testLogoTypeParsing(DeviceModel iPhone, LogoType expectedLogoType) {
-      test('Should return ${expectedLogoType.name} when iPhone is ${iPhone.name}',
+      test(
+          'Should return ${expectedLogoType.name} when iPhone is ${iPhone.name}',
           () {
         when(() => mockBaseDeviceInfo.data).thenReturn(
             TestUtils.buildMockDeviceInfoDataMap(
                 'iPhone${TestUtils.iPhoneToCode(iPhone)}'));
-        expect(parser.logoType, expectedLogoType);
+        expect(parser.iPhonesLogoType, expectedLogoType);
       });
     }
 
@@ -132,5 +133,11 @@ void main() {
     testLogoTypeParsing(DeviceModel.iPhone16Pro, LogoType.dynamicIsland);
     testLogoTypeParsing(DeviceModel.iPhone16ProMax, LogoType.dynamicIsland);
     // Add more tests when new iPhones are released
+
+    test('Should return logo type equals to null when device is not supported',
+        () {
+      when(() => mockBaseDeviceInfo.data).thenReturn({});
+      expect(() => parser.iPhonesLogoType, throwsAssertionError);
+    });
   });
 }

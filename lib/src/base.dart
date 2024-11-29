@@ -88,7 +88,7 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
                       padding: EdgeInsets.only(
                         top: widget.parser.dynamicIslandTopMargin,
                       ),
-                      child: widget.parser.logoType == LogoType.notch
+                      child: widget.parser.iPhonesLogoType == LogoType.notch
                           ? widget.notchBuilder(
                               context,
                               constraints,

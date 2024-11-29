@@ -132,8 +132,8 @@ class HiddenLogoParser {
   /// Returns true if current device is one of target iPhones
   bool get isTargetIPhone => currentIPhone != null;
 
-  /// Returns type of current iPhone's hardware barrier
-  LogoType get logoType {
+  /// Returns type of current iPhone's hardware barrier or null for non target devices
+  LogoType get iPhonesLogoType {
     assert(isTargetIPhone);
     switch (currentIPhone) {
       case DeviceModel.iPhone14Pro:
