@@ -92,4 +92,45 @@ void main() {
     testCodeParsing('iPhone17,2', DeviceModel.iPhone16ProMax);
     // Add more tests when new iPhones are released
   });
+
+  group('Logo types for iPhones', () {
+    void testLogoTypeParsing(DeviceModel iPhone, LogoType expectedLogoType) {
+      test('Should return ${expectedLogoType.name} when iPhone is ${iPhone.name}',
+          () {
+        when(() => mockBaseDeviceInfo.data).thenReturn(
+            TestUtils.buildMockDeviceInfoDataMap(
+                'iPhone${TestUtils.iPhoneToCode(iPhone)}'));
+        expect(parser.logoType, expectedLogoType);
+      });
+    }
+
+    testLogoTypeParsing(DeviceModel.iPhoneX, LogoType.notch);
+    testLogoTypeParsing(DeviceModel.iPhoneXr, LogoType.notch);
+    testLogoTypeParsing(DeviceModel.iPhoneXs, LogoType.notch);
+    testLogoTypeParsing(DeviceModel.iPhoneXsMax, LogoType.notch);
+    testLogoTypeParsing(DeviceModel.iPhone11, LogoType.notch);
+    testLogoTypeParsing(DeviceModel.iPhone11Pro, LogoType.notch);
+    testLogoTypeParsing(DeviceModel.iPhone11ProMax, LogoType.notch);
+    testLogoTypeParsing(DeviceModel.iPhone12Mini, LogoType.notch);
+    testLogoTypeParsing(DeviceModel.iPhone12, LogoType.notch);
+    testLogoTypeParsing(DeviceModel.iPhone12Pro, LogoType.notch);
+    testLogoTypeParsing(DeviceModel.iPhone12ProMax, LogoType.notch);
+    testLogoTypeParsing(DeviceModel.iPhone13Pro, LogoType.notch);
+    testLogoTypeParsing(DeviceModel.iPhone13ProMax, LogoType.notch);
+    testLogoTypeParsing(DeviceModel.iPhone13Mini, LogoType.notch);
+    testLogoTypeParsing(DeviceModel.iPhone13, LogoType.notch);
+    testLogoTypeParsing(DeviceModel.iPhone14, LogoType.notch);
+    testLogoTypeParsing(DeviceModel.iPhone14Plus, LogoType.notch);
+    testLogoTypeParsing(DeviceModel.iPhone14Pro, LogoType.dynamicIsland);
+    testLogoTypeParsing(DeviceModel.iPhone14ProMax, LogoType.dynamicIsland);
+    testLogoTypeParsing(DeviceModel.iPhone15, LogoType.dynamicIsland);
+    testLogoTypeParsing(DeviceModel.iPhone15Plus, LogoType.dynamicIsland);
+    testLogoTypeParsing(DeviceModel.iPhone15Pro, LogoType.dynamicIsland);
+    testLogoTypeParsing(DeviceModel.iPhone15ProMax, LogoType.dynamicIsland);
+    testLogoTypeParsing(DeviceModel.iPhone16, LogoType.dynamicIsland);
+    testLogoTypeParsing(DeviceModel.iPhone16Plus, LogoType.dynamicIsland);
+    testLogoTypeParsing(DeviceModel.iPhone16Pro, LogoType.dynamicIsland);
+    testLogoTypeParsing(DeviceModel.iPhone16ProMax, LogoType.dynamicIsland);
+    // Add more tests when new iPhones are released
+  });
 }
