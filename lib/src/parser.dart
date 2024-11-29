@@ -129,13 +129,6 @@ class HiddenLogoParser {
     _deviceInfoInitializationCompleter.complete();
   }
 
-  void _verifyDeviceInfoInitialized() {
-    if (!_deviceInfoInitializationCompleter.isCompleted) {
-      throw StateError(
-          'HiddenLogoParser\'s _deviceInfo property is not initialized, set it first!');
-    }
-  }
-
   /// Returns true if current device is one of target iPhones
   bool get isTargetIPhone => currentIPhone != null;
 
@@ -161,7 +154,10 @@ class HiddenLogoParser {
 
   /// Returns current iPhone model or null for non target device
   DeviceModel? get currentIPhone {
-    _verifyDeviceInfoInitialized();
+    if (!_deviceInfoInitializationCompleter.isCompleted) {
+      throw StateError(
+          'HiddenLogoParser\'s _deviceInfo property is not initialized, set it first!');
+    }
     late final String deviceName;
     late final String deviceCode;
     try {

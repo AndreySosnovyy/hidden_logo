@@ -28,7 +28,8 @@ void main() {
       expect(parser.currentIPhone, anyOf([null, DeviceModel]));
     });
 
-    test('Parser should throw an error of StateError type if deviceInfo is '
+    test(
+        'Parser should throw an error of StateError type if deviceInfo is '
         'set via constructor and then set via setter', () {
       final mockBaseDeviceInfo = MockBaseDeviceInfo();
       final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
@@ -36,13 +37,26 @@ void main() {
           throwsA(isA<StateError>()));
     });
 
-    test('Parser should throw an error of StateError type if deviceInfo is '
+    test(
+        'Parser should throw an error of StateError type if deviceInfo is '
         'set via setter 2 times', () {
       final mockBaseDeviceInfo = MockBaseDeviceInfo();
       final parser = HiddenLogoParser();
       parser.deviceInfo = mockBaseDeviceInfo;
       expect(() => parser.deviceInfo = mockBaseDeviceInfo,
           throwsA(isA<StateError>()));
+    });
+
+    test('isDeviceInfoSet should return true when deviceInfo is set', () {
+      final mockBaseDeviceInfo = MockBaseDeviceInfo();
+      final parser = HiddenLogoParser();
+      parser.deviceInfo = mockBaseDeviceInfo;
+      expect(parser.isDeviceInfoSet, true);
+    });
+
+    test('isDeviceInfoSet should return false when deviceInfo is not set', () {
+      final parser = HiddenLogoParser();
+      expect(parser.isDeviceInfoSet, false);
     });
   });
 }

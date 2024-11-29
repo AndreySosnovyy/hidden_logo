@@ -95,6 +95,7 @@ class _EmptyAppWithHiddenLogoState extends State<EmptyAppWithHiddenLogo> {
   }
 }
 
+// TODO(Sosnovyy): write the same tests for Dynamic Island
 void main() {
   final mockBaseDeviceInfo = MockBaseDeviceInfo();
   final mockDeviceInfoPlugin = MockDeviceInfoPlugin();
@@ -282,6 +283,4 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(notchKey), findsOneWidget);
   });
-
-  // group('Test HiddenLogo is the same as HiddenLogoBase', () {});
 }
