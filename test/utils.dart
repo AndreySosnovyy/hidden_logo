@@ -114,6 +114,7 @@ class TestUtils {
     DeviceModel.iPhone13,
     DeviceModel.iPhone14,
     DeviceModel.iPhone14Plus,
+    DeviceModel.iPhone16e,
   ];
 
   static final _iPhonesWithDynamicIsland = [

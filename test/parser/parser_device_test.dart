@@ -90,7 +90,7 @@ void main() {
     testCodeParsing('iPhone17,4', DeviceModel.iPhone16Plus);
     testCodeParsing('iPhone17,1', DeviceModel.iPhone16Pro);
     testCodeParsing('iPhone17,2', DeviceModel.iPhone16ProMax);
-    // Add more tests when new iPhones are released
+    testCodeParsing('iPhone17,5', DeviceModel.iPhone16e);
   });
 
   group('Logo types for iPhones', () {
@@ -122,6 +122,7 @@ void main() {
     testLogoTypeParsing(DeviceModel.iPhone13, LogoType.notch);
     testLogoTypeParsing(DeviceModel.iPhone14, LogoType.notch);
     testLogoTypeParsing(DeviceModel.iPhone14Plus, LogoType.notch);
+    testLogoTypeParsing(DeviceModel.iPhone16e, LogoType.notch);
     testLogoTypeParsing(DeviceModel.iPhone14Pro, LogoType.dynamicIsland);
     testLogoTypeParsing(DeviceModel.iPhone14ProMax, LogoType.dynamicIsland);
     testLogoTypeParsing(DeviceModel.iPhone15, LogoType.dynamicIsland);
@@ -132,7 +133,6 @@ void main() {
     testLogoTypeParsing(DeviceModel.iPhone16Plus, LogoType.dynamicIsland);
     testLogoTypeParsing(DeviceModel.iPhone16Pro, LogoType.dynamicIsland);
     testLogoTypeParsing(DeviceModel.iPhone16ProMax, LogoType.dynamicIsland);
-    // Add more tests when new iPhones are released
 
     test('Should return and assert error when device is not supported',
         () {

@@ -112,6 +112,7 @@ Device → Trigger Screenshot)
 | 13 Pro Max |                |
 | 14         |                |
 | 14 Plus    |                |
+| 16e        |                |
 
 ## About new devices support
 
