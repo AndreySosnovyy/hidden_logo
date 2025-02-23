@@ -89,7 +89,9 @@ class TestUtils {
       case DeviceModel.iPhone16ProMax:
         code = '17,2';
         break;
-      // Add new cases when new iPhones are released
+      case DeviceModel.iPhone16e:
+        code = '17,5';
+        break;
     }
     return '${withPrefix ? 'iPhone' : ''}$code';
   }

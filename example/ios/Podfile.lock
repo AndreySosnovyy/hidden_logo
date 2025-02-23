@@ -14,9 +14,9 @@ EXTERNAL SOURCES:
     :path: Flutter
 
 SPEC CHECKSUMS:
-  device_info_plus: bf2e3232933866d73fe290f2942f2156cdd10342
+  device_info_plus: 21fcca2080fbcd348be798aa36c3e5ed849eefbe
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
 
 PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

@@ -96,6 +96,9 @@ enum DeviceModel {
 
   /// iPhone 16 Pro Max
   iPhone16ProMax,
+
+  /// iPhone 16e
+  iPhone16e,
 }
 
 /// {@template hidden_logo.HiddenLogoParser}
@@ -224,6 +227,8 @@ class HiddenLogoParser {
         return DeviceModel.iPhone16Pro;
       case '17,2':
         return DeviceModel.iPhone16ProMax;
+      case '17,5':
+        return DeviceModel.iPhone16e;
       default:
         return null;
     }
@@ -251,6 +256,7 @@ class HiddenLogoParser {
       case DeviceModel.iPhone14:
       case DeviceModel.iPhone14Plus:
       case DeviceModel.iPhone13:
+      case DeviceModel.iPhone16e:
         return const BoxConstraints(maxHeight: 33.0, maxWidth: 162.0);
 
       case DeviceModel.iPhoneXr:

@@ -1,3 +1,8 @@
+## 0.1.1
+
+* Added iPhone 16e support
+* Updated dependencies
+
 ## 0.1.0
 
 **BREAKING!**
