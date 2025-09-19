@@ -60,9 +60,12 @@ void main() {
     testConstraintsParsing(DeviceModel.iPhone15ProMax, bc367x1220);
     testConstraintsParsing(DeviceModel.iPhone16, bc367x1220);
     testConstraintsParsing(DeviceModel.iPhone16Plus, bc367x1220);
-    const bc370x1220 = BoxConstraints(maxHeight: 37.0, maxWidth: 122.0);
-    testConstraintsParsing(DeviceModel.iPhone16Pro, bc370x1220);
-    testConstraintsParsing(DeviceModel.iPhone16ProMax, bc370x1220);
+    testConstraintsParsing(DeviceModel.iPhone16Pro, bc367x1220);
+    testConstraintsParsing(DeviceModel.iPhone16ProMax, bc367x1220);
+    testConstraintsParsing(DeviceModel.iPhone17, bc367x1220);
+    testConstraintsParsing(DeviceModel.iPhoneAir, bc367x1220);
+    testConstraintsParsing(DeviceModel.iPhone17Pro, bc367x1220);
+    testConstraintsParsing(DeviceModel.iPhone17ProMax, bc367x1220);
 
     test('Should return 0x0 BoxConstrains if unable to parse iPhone', () {
       when(() => parser.currentIPhone).thenReturn(null);
@@ -114,6 +117,10 @@ void main() {
     testTopMarginParsing(DeviceModel.iPhone16Plus, 11.3);
     testTopMarginParsing(DeviceModel.iPhone16Pro, 14.0);
     testTopMarginParsing(DeviceModel.iPhone16ProMax, 14.0);
+    testTopMarginParsing(DeviceModel.iPhone17, 14.0);
+    testTopMarginParsing(DeviceModel.iPhone17Pro, 14.0);
+    testTopMarginParsing(DeviceModel.iPhone17ProMax, 14.0);
+    testTopMarginParsing(DeviceModel.iPhoneAir, 20.0);
 
     test('Should return 0 top margin if unable to parse iPhone', () {
       when(() => parser.currentIPhone).thenReturn(null);

@@ -92,6 +92,18 @@ class TestUtils {
       case DeviceModel.iPhone16e:
         code = '17,5';
         break;
+      case DeviceModel.iPhone17:
+        code = '18,3';
+        break;
+      case DeviceModel.iPhoneAir:
+        code = '18,4';
+        break;
+      case DeviceModel.iPhone17Pro:
+        code = '18,1';
+        break;
+      case DeviceModel.iPhone17ProMax:
+        code = '18,2';
+        break;
     }
     return '${withPrefix ? 'iPhone' : ''}$code';
   }
@@ -128,6 +140,10 @@ class TestUtils {
     DeviceModel.iPhone16Plus,
     DeviceModel.iPhone16Pro,
     DeviceModel.iPhone16ProMax,
+    DeviceModel.iPhone17,
+    DeviceModel.iPhoneAir,
+    DeviceModel.iPhone17Pro,
+    DeviceModel.iPhone17ProMax,
   ];
 
   static DeviceModel getRandomIPhone({LogoType? logoType}) {

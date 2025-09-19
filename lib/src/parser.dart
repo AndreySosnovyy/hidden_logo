@@ -7,14 +7,14 @@ import 'package:flutter/widgets.dart';
 /// Possible locations of the brand logo hidden behind
 /// iPhone's hardware barriers
 enum LogoType {
-  /// Hardware barrier for iPhones from iPhone X to iPhone 14 Plus
+  /// Hardware barrier for iPhones from iPhone X to iPhone 16e
   notch,
 
-  /// Hardware barrier for iPhones from iPhone 14 Pro
+  /// Hardware barrier for iPhones from iPhone 14 Pro onwards
   dynamicIsland,
 }
 
-///  Target iPhones: the ones with notch or dynamic island only
+/// Target iPhones: the ones with notch or dynamic island only
 enum DeviceModel {
   /// iPhone X
   iPhoneX,
@@ -99,6 +99,18 @@ enum DeviceModel {
 
   /// iPhone 16e
   iPhone16e,
+
+  /// iPhone 17
+  iPhone17,
+
+  /// iPhone Air
+  iPhoneAir,
+
+  /// iPhone 17 Pro
+  iPhone17Pro,
+
+  /// iPhone 17 Pro Max
+  iPhone17ProMax,
 }
 
 /// {@template hidden_logo.HiddenLogoParser}
@@ -149,6 +161,10 @@ class HiddenLogoParser {
       case DeviceModel.iPhone16Plus:
       case DeviceModel.iPhone16Pro:
       case DeviceModel.iPhone16ProMax:
+      case DeviceModel.iPhone17:
+      case DeviceModel.iPhoneAir:
+      case DeviceModel.iPhone17Pro:
+      case DeviceModel.iPhone17ProMax:
         return LogoType.dynamicIsland;
       default:
         return LogoType.notch;
@@ -229,6 +245,14 @@ class HiddenLogoParser {
         return DeviceModel.iPhone16ProMax;
       case '17,5':
         return DeviceModel.iPhone16e;
+      case '18,1':
+        return DeviceModel.iPhone17Pro;
+      case '18,2':
+        return DeviceModel.iPhone17ProMax;
+      case '18,3':
+        return DeviceModel.iPhone17;
+      case '18,4':
+        return DeviceModel.iPhoneAir;
       default:
         return null;
     }
@@ -282,10 +306,13 @@ class HiddenLogoParser {
       case DeviceModel.iPhone15ProMax:
       case DeviceModel.iPhone16:
       case DeviceModel.iPhone16Plus:
-        return const BoxConstraints(maxHeight: 36.7, maxWidth: 122.0);
+      case DeviceModel.iPhone17:
+      case DeviceModel.iPhoneAir:
       case DeviceModel.iPhone16Pro:
       case DeviceModel.iPhone16ProMax:
-        return const BoxConstraints(maxHeight: 37.0, maxWidth: 122.0);
+      case DeviceModel.iPhone17Pro:
+      case DeviceModel.iPhone17ProMax:
+        return const BoxConstraints(maxHeight: 36.7, maxWidth: 122.0);
       case null:
         return const BoxConstraints(maxHeight: 0, maxWidth: 0);
     }
@@ -305,7 +332,12 @@ class HiddenLogoParser {
         return 11.3;
       case DeviceModel.iPhone16Pro:
       case DeviceModel.iPhone16ProMax:
+      case DeviceModel.iPhone17:
+      case DeviceModel.iPhone17Pro:
+      case DeviceModel.iPhone17ProMax:
         return 14.0;
+      case DeviceModel.iPhoneAir:
+        return 20.0;
       default:
         return 0.0;
     }
