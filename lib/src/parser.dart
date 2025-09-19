@@ -4,17 +4,46 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
-/// Possible locations of the brand logo hidden behind
-/// iPhone's hardware barriers
+/// {@template hidden_logo.LogoType}
+/// Defines the type of hardware barrier where the logo can be positioned
+/// on supported iPhone devices.
+///
+/// Different iPhone models have different hardware barriers at the top
+/// of the screen that can hide logos during certain scenarios like
+/// screenshots or when the app is minimized.
+/// {@endtemplate}
 enum LogoType {
-  /// Hardware barrier for iPhones from iPhone X to iPhone 14 Plus
+  /// Hardware barrier found on iPhones from iPhone X to iPhone 16e.
+  ///
+  /// The notch is a black cutout at the top center of the screen that
+  /// houses the front camera and sensors. Logos placed behind the notch
+  /// area will be hidden from normal view but visible in screenshots
+  /// and when the app is minimized.
   notch,
 
-  /// Hardware barrier for iPhones from iPhone 14 Pro
+  /// Hardware barrier found on iPhones from iPhone 14 Pro onwards.
+  ///
+  /// The Dynamic Island is a pill-shaped interactive area at the top
+  /// center of the screen. It's smaller than the notch and has rounded
+  /// corners. Logos placed behind this area follow the same visibility
+  /// rules as notch logos but are automatically clipped to rounded corners.
   dynamicIsland,
 }
 
-///  Target iPhones: the ones with notch or dynamic island only
+/// {@template hidden_logo.DeviceModel}
+/// Enumeration of all iPhone models supported by the hidden_logo package.
+///
+/// This enum contains all iPhone models from iPhone X onwards that have
+/// either a notch or Dynamic Island hardware barrier where logos can be
+/// positioned. Each model has specific size constraints and positioning
+/// requirements for optimal logo placement.
+///
+/// The supported models are categorized into two groups:
+/// - **Notch devices**: iPhone X through iPhone 16e
+/// - **Dynamic Island devices**: iPhone 14 Pro series through iPhone 17 series
+///
+/// See [LogoType] for the hardware barrier types.
+/// {@endtemplate}
 enum DeviceModel {
   /// iPhone X
   iPhoneX,
@@ -99,6 +128,18 @@ enum DeviceModel {
 
   /// iPhone 16e
   iPhone16e,
+
+  /// iPhone 17
+  iPhone17,
+
+  /// iPhone Air
+  iPhoneAir,
+
+  /// iPhone 17 Pro
+  iPhone17Pro,
+
+  /// iPhone 17 Pro Max
+  iPhone17ProMax,
 }
 
 /// {@template hidden_logo.HiddenLogoParser}
@@ -106,6 +147,67 @@ enum DeviceModel {
 /// display child widget for HiddenLogo for current device.
 /// {@endtemplate}
 class HiddenLogoParser {
+  /// Centralized mapping of device codes to iPhone models
+  static const Map<String, DeviceModel> _deviceCodeMap = {
+    '10,6': DeviceModel.iPhoneX,
+    '11,2': DeviceModel.iPhoneXs,
+    '11,4': DeviceModel.iPhoneXsMax,
+    '11,6': DeviceModel.iPhoneXsMax,
+    '11,8': DeviceModel.iPhoneXr,
+    '12,1': DeviceModel.iPhone11,
+    '12,3': DeviceModel.iPhone11Pro,
+    '12,5': DeviceModel.iPhone11ProMax,
+    '13,1': DeviceModel.iPhone12Mini,
+    '13,2': DeviceModel.iPhone12,
+    '13,3': DeviceModel.iPhone12Pro,
+    '13,4': DeviceModel.iPhone12ProMax,
+    '14,2': DeviceModel.iPhone13Pro,
+    '14,3': DeviceModel.iPhone13ProMax,
+    '14,4': DeviceModel.iPhone13Mini,
+    '14,5': DeviceModel.iPhone13,
+    '14,7': DeviceModel.iPhone14,
+    '14,8': DeviceModel.iPhone14Plus,
+    '15,2': DeviceModel.iPhone14Pro,
+    '15,3': DeviceModel.iPhone14ProMax,
+    '15,4': DeviceModel.iPhone15,
+    '15,5': DeviceModel.iPhone15Plus,
+    '16,1': DeviceModel.iPhone15Pro,
+    '16,2': DeviceModel.iPhone15ProMax,
+    '17,3': DeviceModel.iPhone16,
+    '17,4': DeviceModel.iPhone16Plus,
+    '17,1': DeviceModel.iPhone16Pro,
+    '17,2': DeviceModel.iPhone16ProMax,
+    '17,5': DeviceModel.iPhone16e,
+    '18,1': DeviceModel.iPhone17Pro,
+    '18,2': DeviceModel.iPhone17ProMax,
+    '18,3': DeviceModel.iPhone17,
+    '18,4': DeviceModel.iPhoneAir,
+  };
+
+  /// Returns the device code string for a given iPhone model.
+  ///
+  /// This method is primarily used for testing purposes to convert from
+  /// a [DeviceModel] enum value back to its corresponding device code string.
+  ///
+  /// For example:
+  /// ```dart
+  /// final code = HiddenLogoParser.getDeviceCode(DeviceModel.iPhoneX);
+  /// print(code); // "10,6"
+  /// ```
+  ///
+  /// Returns `null` if the iPhone model is not found in the mapping.
+  ///
+  /// See also:
+  /// * [currentIPhone] for the reverse operation (code to model)
+  static String? getDeviceCode(DeviceModel iPhone) {
+    try {
+      return _deviceCodeMap.entries
+          .firstWhere((entry) => entry.value == iPhone)
+          .key;
+    } catch (_) {
+      return null;
+    }
+  }
   /// {@macro hidden_logo.HiddenLogoParser}
   HiddenLogoParser({
     BaseDeviceInfo? deviceInfo,
@@ -132,10 +234,33 @@ class HiddenLogoParser {
     _deviceInfoInitializationCompleter.complete();
   }
 
-  /// Returns true if current device is one of target iPhones
+  /// Whether the current device is a supported iPhone model.
+  ///
+  /// Returns `true` if the current device is one of the supported iPhone models
+  /// that have either a notch or Dynamic Island. Returns `false` for all other
+  /// devices including iPads, non-Apple devices, or unsupported iPhone models.
+  ///
+  /// This is a convenience getter that checks if [currentIPhone] is not null.
   bool get isTargetIPhone => currentIPhone != null;
 
-  /// Returns type of current iPhone's hardware barrier or null for non target devices
+  /// The hardware barrier type for the current iPhone.
+  ///
+  /// Returns [LogoType.notch] for iPhone models from iPhone X through iPhone 16e,
+  /// and [LogoType.dynamicIsland] for iPhone 14 Pro series through iPhone 17 series.
+  ///
+  /// **Important**: This getter assumes the device is a target iPhone. It will
+  /// throw an assertion error if called on a non-target device. Always check
+  /// [isTargetIPhone] first.
+  ///
+  /// Example:
+  /// ```dart
+  /// if (parser.isTargetIPhone) {
+  ///   final logoType = parser.iPhonesLogoType;
+  ///   if (logoType == LogoType.dynamicIsland) {
+  ///     // Handle Dynamic Island
+  ///   }
+  /// }
+  /// ```
   LogoType get iPhonesLogoType {
     assert(isTargetIPhone);
     switch (currentIPhone) {
@@ -149,13 +274,35 @@ class HiddenLogoParser {
       case DeviceModel.iPhone16Plus:
       case DeviceModel.iPhone16Pro:
       case DeviceModel.iPhone16ProMax:
+      case DeviceModel.iPhone17:
+      case DeviceModel.iPhoneAir:
+      case DeviceModel.iPhone17Pro:
+      case DeviceModel.iPhone17ProMax:
         return LogoType.dynamicIsland;
       default:
         return LogoType.notch;
     }
   }
 
-  /// Returns current iPhone model or null for non target device
+  /// The specific iPhone model of the current device.
+  ///
+  /// Parses the device information to determine which iPhone model is currently
+  /// running the app. Returns `null` for non-iPhone devices or unsupported models.
+  ///
+  /// The detection is based on the device's machine identifier (e.g., "iPhone10,6"
+  /// for iPhone X). This method safely handles edge cases like non-iPhone devices
+  /// or corrupted device information.
+  ///
+  /// Example usage:
+  /// ```dart
+  /// final model = parser.currentIPhone;
+  /// if (model == DeviceModel.iPhoneX) {
+  ///   // Handle iPhone X specific logic
+  /// }
+  /// ```
+  ///
+  /// **Note**: The device info must be initialized before calling this getter.
+  /// Use [isDeviceInfoSet] to check initialization status.
   DeviceModel? get currentIPhone {
     if (!_deviceInfoInitializationCompleter.isCompleted) {
       throw StateError(
@@ -165,83 +312,69 @@ class HiddenLogoParser {
     late final String deviceCode;
     try {
       deviceName = _deviceInfo.data['utsname']['machine'];
+      if (!deviceName.startsWith('iPhone')) return null;
       deviceCode = deviceName.substring('iPhone'.length);
-    } on Object {
+    } on TypeError catch (_) {
+      // Handles cases where data structure is unexpected (e.g., null values, wrong types)
+      return null;
+    } on NoSuchMethodError catch (_) {
+      // Handles cases where expected methods don't exist (e.g., data is not a Map)
+      return null;
+    } on RangeError catch (_) {
+      // Handles cases where substring operation fails due to invalid indices
+      return null;
+    } catch (_) {
+      // Fallback for any other unexpected exceptions
       return null;
     }
     if (deviceName.isEmpty || deviceCode.isEmpty) return null;
-    switch (deviceCode) {
-      case '10,6':
-        return DeviceModel.iPhoneX;
-      case '11,2':
-        return DeviceModel.iPhoneXs;
-      case '11,4':
-        return DeviceModel.iPhoneXsMax;
-      case '11,6':
-        return DeviceModel.iPhoneXsMax;
-      case '11,8':
-        return DeviceModel.iPhoneXr;
-      case '12,1':
-        return DeviceModel.iPhone11;
-      case '12,3':
-        return DeviceModel.iPhone11Pro;
-      case '12,5':
-        return DeviceModel.iPhone11ProMax;
-      case '13,1':
-        return DeviceModel.iPhone12Mini;
-      case '13,2':
-        return DeviceModel.iPhone12;
-      case '13,3':
-        return DeviceModel.iPhone12Pro;
-      case '13,4':
-        return DeviceModel.iPhone12ProMax;
-      case '14,2':
-        return DeviceModel.iPhone13Pro;
-      case '14,3':
-        return DeviceModel.iPhone13ProMax;
-      case '14,4':
-        return DeviceModel.iPhone13Mini;
-      case '14,5':
-        return DeviceModel.iPhone13;
-      case '14,7':
-        return DeviceModel.iPhone14;
-      case '14,8':
-        return DeviceModel.iPhone14Plus;
-      case '15,2':
-        return DeviceModel.iPhone14Pro;
-      case '15,3':
-        return DeviceModel.iPhone14ProMax;
-      case '15,4':
-        return DeviceModel.iPhone15;
-      case '15,5':
-        return DeviceModel.iPhone15Plus;
-      case '16,1':
-        return DeviceModel.iPhone15Pro;
-      case '16,2':
-        return DeviceModel.iPhone15ProMax;
-      case '17,3':
-        return DeviceModel.iPhone16;
-      case '17,4':
-        return DeviceModel.iPhone16Plus;
-      case '17,1':
-        return DeviceModel.iPhone16Pro;
-      case '17,2':
-        return DeviceModel.iPhone16ProMax;
-      case '17,5':
-        return DeviceModel.iPhone16e;
-      default:
-        return null;
-    }
+    return _deviceCodeMap[deviceCode];
   }
 
-  /// Returns true if device is an iPhone and it has notch or Dynamic Island on top
+  /// Whether the current device supports logo placement.
+  ///
+  /// Returns `true` only if the device meets all requirements for logo display:
+  /// - Must be running on iOS platform
+  /// - Must be a supported iPhone model with notch or Dynamic Island
+  ///
+  /// This combines platform detection with iPhone model validation to provide
+  /// a single check for logo rendering eligibility.
+  ///
+  /// Example:
+  /// ```dart
+  /// if (parser.isTargetDevice) {
+  ///   // Safe to display logo
+  ///   final constraints = parser.logoConstraints;
+  /// }
+  /// ```
   bool get isTargetDevice {
     final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
     if (isIOS && isTargetIPhone) return true;
     return false;
   }
 
-  /// Returns notch size for old iPhones and Dynamic Island size for new ones
+  /// The size constraints for logo placement on the current iPhone.
+  ///
+  /// Returns precise [BoxConstraints] that define the maximum dimensions
+  /// available for logo rendering behind the hardware barrier. These constraints
+  /// are carefully measured for each iPhone model to ensure logos fit perfectly
+  /// within the available space.
+  ///
+  /// Different iPhone models have different constraint values:
+  /// - **iPhone X series**: 30.0×209.0 or 33.0×230.0 depending on model
+  /// - **iPhone 12 series**: 32.2×211.0 to 37.4×175.0 depending on model
+  /// - **iPhone 13-16 series**: 33.0×162.0 for standard models
+  /// - **Dynamic Island models**: 36.7×122.0 for all Dynamic Island devices
+  ///
+  /// Returns zero constraints (0×0) for unsupported devices, which should
+  /// be validated before use.
+  ///
+  /// Example:
+  /// ```dart
+  /// final constraints = parser.logoConstraints;
+  /// final maxWidth = constraints.maxWidth;  // e.g., 122.0 for iPhone 15 Pro
+  /// final maxHeight = constraints.maxHeight; // e.g., 36.7 for iPhone 15 Pro
+  /// ```
   BoxConstraints get logoConstraints {
     switch (currentIPhone) {
       case DeviceModel.iPhoneX:
@@ -282,16 +415,38 @@ class HiddenLogoParser {
       case DeviceModel.iPhone15ProMax:
       case DeviceModel.iPhone16:
       case DeviceModel.iPhone16Plus:
-        return const BoxConstraints(maxHeight: 36.7, maxWidth: 122.0);
+      case DeviceModel.iPhone17:
+      case DeviceModel.iPhoneAir:
       case DeviceModel.iPhone16Pro:
       case DeviceModel.iPhone16ProMax:
-        return const BoxConstraints(maxHeight: 37.0, maxWidth: 122.0);
+      case DeviceModel.iPhone17Pro:
+      case DeviceModel.iPhone17ProMax:
+        return const BoxConstraints(maxHeight: 36.7, maxWidth: 122.0);
       case null:
         return const BoxConstraints(maxHeight: 0, maxWidth: 0);
     }
   }
 
-  /// Returns 0 for non dynamic island devices
+  /// The top margin for Dynamic Island logo positioning.
+  ///
+  /// Returns the vertical offset (in logical pixels) from the top of the screen
+  /// where the Dynamic Island logo should be positioned. This ensures proper
+  /// alignment with the Dynamic Island hardware barrier.
+  ///
+  /// Margin values by device generation:
+  /// - **iPhone 14 Pro/15 series**: 11.3 pixels
+  /// - **iPhone 16 Pro/17 series**: 14.0 pixels
+  /// - **iPhone Air**: 20.0 pixels
+  /// - **All notch devices**: 0.0 pixels (no margin needed)
+  ///
+  /// The margin accounts for differences in Dynamic Island positioning
+  /// across iPhone generations.
+  ///
+  /// Example:
+  /// ```dart
+  /// final margin = parser.dynamicIslandTopMargin;
+  /// // Use margin as top padding for Dynamic Island logos
+  /// ```
   double get dynamicIslandTopMargin {
     switch (currentIPhone) {
       case DeviceModel.iPhone14Pro:
@@ -305,7 +460,12 @@ class HiddenLogoParser {
         return 11.3;
       case DeviceModel.iPhone16Pro:
       case DeviceModel.iPhone16ProMax:
+      case DeviceModel.iPhone17:
+      case DeviceModel.iPhone17Pro:
+      case DeviceModel.iPhone17ProMax:
         return 14.0;
+      case DeviceModel.iPhoneAir:
+        return 20.0;
       default:
         return 0.0;
     }
