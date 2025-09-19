@@ -5,6 +5,7 @@
 * Optimize layout logic
 * Update README typos
 * Add more documentation
+* Add more tests
 
 ## 0.1.2
 
