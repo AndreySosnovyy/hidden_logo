@@ -314,7 +314,17 @@ class HiddenLogoParser {
       deviceName = _deviceInfo.data['utsname']['machine'];
       if (!deviceName.startsWith('iPhone')) return null;
       deviceCode = deviceName.substring('iPhone'.length);
-    } on Object {
+    } on TypeError catch (_) {
+      // Handles cases where data structure is unexpected (e.g., null values, wrong types)
+      return null;
+    } on NoSuchMethodError catch (_) {
+      // Handles cases where expected methods don't exist (e.g., data is not a Map)
+      return null;
+    } on RangeError catch (_) {
+      // Handles cases where substring operation fails due to invalid indices
+      return null;
+    } catch (_) {
+      // Fallback for any other unexpected exceptions
       return null;
     }
     if (deviceName.isEmpty || deviceCode.isEmpty) return null;
