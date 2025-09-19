@@ -83,7 +83,9 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
                 if (widget.parser.isTargetDevice &&
                     widget.isVisible &&
                     (widget.visibilityMode == LogoVisibilityMode.always ||
-                        !_isForeground))
+                        !_isForeground) &&
+                    constraints.maxHeight > 0 &&
+                    constraints.maxWidth > 0)
                   Align(
                     alignment: Alignment.topCenter,
                     child: Padding(

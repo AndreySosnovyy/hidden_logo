@@ -4,6 +4,7 @@
 * Add support for iPhone 17 series: iPhone 17, iPhone Air, iPhone 17 Pro, iPhone 17 Pro Max
 * Optimize layout logic
 * Update README typos
+* Add more documentation
 
 ## 0.1.2
 
