@@ -118,6 +118,53 @@ enum DeviceModel {
 /// display child widget for HiddenLogo for current device.
 /// {@endtemplate}
 class HiddenLogoParser {
+  /// Centralized mapping of device codes to iPhone models
+  static const Map<String, DeviceModel> _deviceCodeMap = {
+    '10,6': DeviceModel.iPhoneX,
+    '11,2': DeviceModel.iPhoneXs,
+    '11,4': DeviceModel.iPhoneXsMax,
+    '11,6': DeviceModel.iPhoneXsMax,
+    '11,8': DeviceModel.iPhoneXr,
+    '12,1': DeviceModel.iPhone11,
+    '12,3': DeviceModel.iPhone11Pro,
+    '12,5': DeviceModel.iPhone11ProMax,
+    '13,1': DeviceModel.iPhone12Mini,
+    '13,2': DeviceModel.iPhone12,
+    '13,3': DeviceModel.iPhone12Pro,
+    '13,4': DeviceModel.iPhone12ProMax,
+    '14,2': DeviceModel.iPhone13Pro,
+    '14,3': DeviceModel.iPhone13ProMax,
+    '14,4': DeviceModel.iPhone13Mini,
+    '14,5': DeviceModel.iPhone13,
+    '14,7': DeviceModel.iPhone14,
+    '14,8': DeviceModel.iPhone14Plus,
+    '15,2': DeviceModel.iPhone14Pro,
+    '15,3': DeviceModel.iPhone14ProMax,
+    '15,4': DeviceModel.iPhone15,
+    '15,5': DeviceModel.iPhone15Plus,
+    '16,1': DeviceModel.iPhone15Pro,
+    '16,2': DeviceModel.iPhone15ProMax,
+    '17,3': DeviceModel.iPhone16,
+    '17,4': DeviceModel.iPhone16Plus,
+    '17,1': DeviceModel.iPhone16Pro,
+    '17,2': DeviceModel.iPhone16ProMax,
+    '17,5': DeviceModel.iPhone16e,
+    '18,1': DeviceModel.iPhone17Pro,
+    '18,2': DeviceModel.iPhone17ProMax,
+    '18,3': DeviceModel.iPhone17,
+    '18,4': DeviceModel.iPhoneAir,
+  };
+
+  /// Gets device code for a given iPhone model (used primarily for testing)
+  static String? getDeviceCode(DeviceModel iPhone) {
+    try {
+      return _deviceCodeMap.entries
+          .firstWhere((entry) => entry.value == iPhone)
+          .key;
+    } catch (_) {
+      return null;
+    }
+  }
   /// {@macro hidden_logo.HiddenLogoParser}
   HiddenLogoParser({
     BaseDeviceInfo? deviceInfo,
@@ -187,76 +234,7 @@ class HiddenLogoParser {
       return null;
     }
     if (deviceName.isEmpty || deviceCode.isEmpty) return null;
-    switch (deviceCode) {
-      case '10,6':
-        return DeviceModel.iPhoneX;
-      case '11,2':
-        return DeviceModel.iPhoneXs;
-      case '11,4':
-        return DeviceModel.iPhoneXsMax;
-      case '11,6':
-        return DeviceModel.iPhoneXsMax;
-      case '11,8':
-        return DeviceModel.iPhoneXr;
-      case '12,1':
-        return DeviceModel.iPhone11;
-      case '12,3':
-        return DeviceModel.iPhone11Pro;
-      case '12,5':
-        return DeviceModel.iPhone11ProMax;
-      case '13,1':
-        return DeviceModel.iPhone12Mini;
-      case '13,2':
-        return DeviceModel.iPhone12;
-      case '13,3':
-        return DeviceModel.iPhone12Pro;
-      case '13,4':
-        return DeviceModel.iPhone12ProMax;
-      case '14,2':
-        return DeviceModel.iPhone13Pro;
-      case '14,3':
-        return DeviceModel.iPhone13ProMax;
-      case '14,4':
-        return DeviceModel.iPhone13Mini;
-      case '14,5':
-        return DeviceModel.iPhone13;
-      case '14,7':
-        return DeviceModel.iPhone14;
-      case '14,8':
-        return DeviceModel.iPhone14Plus;
-      case '15,2':
-        return DeviceModel.iPhone14Pro;
-      case '15,3':
-        return DeviceModel.iPhone14ProMax;
-      case '15,4':
-        return DeviceModel.iPhone15;
-      case '15,5':
-        return DeviceModel.iPhone15Plus;
-      case '16,1':
-        return DeviceModel.iPhone15Pro;
-      case '16,2':
-        return DeviceModel.iPhone15ProMax;
-      case '17,3':
-        return DeviceModel.iPhone16;
-      case '17,4':
-        return DeviceModel.iPhone16Plus;
-      case '17,1':
-        return DeviceModel.iPhone16Pro;
-      case '17,2':
-        return DeviceModel.iPhone16ProMax;
-      case '17,5':
-        return DeviceModel.iPhone16e;
-      case '18,1':
-        return DeviceModel.iPhone17Pro;
-      case '18,2':
-        return DeviceModel.iPhone17ProMax;
-      case '18,3':
-        return DeviceModel.iPhone17;
-      case '18,4':
-        return DeviceModel.iPhoneAir;
-      default:
-        return null;
-    }
+    return _deviceCodeMap[deviceCode];
   }
 
   /// Returns true if device is an iPhone and it has notch or Dynamic Island on top
