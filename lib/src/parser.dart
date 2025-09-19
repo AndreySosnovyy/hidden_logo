@@ -181,6 +181,7 @@ class HiddenLogoParser {
     late final String deviceCode;
     try {
       deviceName = _deviceInfo.data['utsname']['machine'];
+      if (!deviceName.startsWith('iPhone')) return null;
       deviceCode = deviceName.substring('iPhone'.length);
     } on Object {
       return null;

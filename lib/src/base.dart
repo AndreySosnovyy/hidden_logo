@@ -32,12 +32,14 @@ class HiddenLogoBase extends StatefulWidget {
 class _HiddenLogoBaseState extends State<HiddenLogoBase>
     with WidgetsBindingObserver {
   late bool _isForeground;
+  late final Future<BaseDeviceInfo> _deviceInfoFuture;
 
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
     _isForeground =
         WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
+    _deviceInfoFuture = widget.deviceInfoPlugin.deviceInfo;
     super.initState();
   }
 
@@ -64,7 +66,7 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
       builder: (context, orientation) {
         if (orientation == Orientation.landscape) return widget.body;
         return FutureBuilder<BaseDeviceInfo>(
-          future: widget.deviceInfoPlugin.deviceInfo,
+          future: _deviceInfoFuture,
           builder: (context, snapshot) {
             if (!snapshot.hasData ||
                 snapshot.hasError ||
