@@ -14,12 +14,10 @@ class DeviceInfoService {
   /// The result is cached after the first successful call.
   static Future<String?> getMachineIdentifier() async {
     if (_initialized) return _cachedMachineId;
-
     if (defaultTargetPlatform != TargetPlatform.iOS) {
       _initialized = true;
       return null;
     }
-
     try {
       _cachedMachineId = await _channel.invokeMethod<String>(
         'getMachineIdentifier',
@@ -29,7 +27,6 @@ class DeviceInfoService {
     } on MissingPluginException {
       _cachedMachineId = null;
     }
-
     _initialized = true;
     return _cachedMachineId;
   }

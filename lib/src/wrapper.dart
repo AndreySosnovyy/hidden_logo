@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hidden_logo/src/base.dart';
-import 'package:hidden_logo/src/parser.dart';
 
 /// Logo builder function
 typedef LogoBuilder =
@@ -20,7 +19,7 @@ enum LogoVisibilityMode {
 /// widget built via provided functions on top of the screen where it it
 /// not visible under the physical hardware barrier.
 /// {@endtemplate}
-class HiddenLogo extends StatefulWidget {
+class HiddenLogo extends StatelessWidget {
   /// {@macro hidden_logo.HiddenLogo}
   const HiddenLogo({
     required this.body,
@@ -49,27 +48,13 @@ class HiddenLogo extends StatefulWidget {
   final bool isVisible;
 
   @override
-  State<HiddenLogo> createState() => _HiddenLogoState();
-}
-
-class _HiddenLogoState extends State<HiddenLogo> {
-  late final HiddenLogoParser _parser;
-
-  @override
-  void initState() {
-    super.initState();
-    _parser = HiddenLogoParser();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return HiddenLogoBase(
-      body: widget.body,
-      notchBuilder: widget.notchBuilder,
-      dynamicIslandBuilder: widget.dynamicIslandBuilder,
-      visibilityMode: widget.visibilityMode,
-      isVisible: widget.isVisible,
-      parser: _parser,
+      body: body,
+      notchBuilder: notchBuilder,
+      dynamicIslandBuilder: dynamicIslandBuilder,
+      visibilityMode: visibilityMode,
+      isVisible: isVisible,
     );
   }
 }

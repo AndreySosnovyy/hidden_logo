@@ -6,7 +6,7 @@ void main() {
   group('Constraint Validation Tests', () {
     group('Invalid Constraint Scenarios', () {
       test('Should return zero constraints for null device', () {
-        final parser = HiddenLogoParser.initialized(machineIdentifier: null);
+        final parser = HiddenLogoParser(machineIdentifier: null);
 
         final constraints = parser.logoConstraints;
         expect(constraints.maxHeight, equals(0));
@@ -140,7 +140,7 @@ void main() {
       });
 
       test('Should return zero margin for unknown devices', () {
-        final parser = HiddenLogoParser.initialized(machineIdentifier: null);
+        final parser = HiddenLogoParser(machineIdentifier: null);
 
         expect(parser.dynamicIslandTopMargin, equals(0));
       });

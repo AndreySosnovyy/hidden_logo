@@ -59,7 +59,7 @@ void main() {
     testConstraintsParsing(DeviceModel.iPhone17ProMax, bc367x1220);
 
     test('Should return 0x0 BoxConstraints if unable to parse iPhone', () {
-      final parser = HiddenLogoParser.initialized(machineIdentifier: null);
+      final parser = HiddenLogoParser(machineIdentifier: null);
       expect(
         parser.logoConstraints,
         const BoxConstraints(maxHeight: 0, maxWidth: 0),
@@ -111,7 +111,7 @@ void main() {
     testTopMarginParsing(DeviceModel.iPhoneAir, 20.0);
 
     test('Should return 0 top margin if unable to parse iPhone', () {
-      final parser = HiddenLogoParser.initialized(machineIdentifier: null);
+      final parser = HiddenLogoParser(machineIdentifier: null);
       expect(parser.dynamicIslandTopMargin, 0);
     });
   });

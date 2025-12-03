@@ -4,7 +4,7 @@ class TestUtils {
   /// Returns the machine identifier string for a given iPhone model.
   /// Example: DeviceModel.iPhoneX -> "iPhone10,6"
   static String getMachineIdentifier(DeviceModel iPhone) {
-    final code = HiddenLogoParser.getDeviceCode(iPhone);
+    final code = HiddenLogoParser.getIPhoneMachineIdentifier(iPhone);
     if (code == null) {
       throw ArgumentError('Device code not found for $iPhone');
     }
@@ -14,7 +14,7 @@ class TestUtils {
   /// Returns just the code part without "iPhone" prefix.
   /// Example: DeviceModel.iPhoneX -> "10,6"
   static String iPhoneToCode(DeviceModel iPhone, {bool withPrefix = false}) {
-    final code = HiddenLogoParser.getDeviceCode(iPhone);
+    final code = HiddenLogoParser.getIPhoneMachineIdentifier(iPhone);
     if (code == null) {
       throw ArgumentError('Device code not found for $iPhone');
     }

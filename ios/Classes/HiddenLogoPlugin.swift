@@ -21,6 +21,10 @@ public class HiddenLogoPlugin: NSObject, FlutterPlugin {
     }
 
     private func getMachineIdentifier() -> String? {
+        if let simulatorModelIdentifier = ProcessInfo().environment["SIMULATOR_MODEL_IDENTIFIER"] {
+            return simulatorModelIdentifier
+        }
+
         var systemInfo = utsname()
         uname(&systemInfo)
         let machine = withUnsafePointer(to: &systemInfo.machine) {

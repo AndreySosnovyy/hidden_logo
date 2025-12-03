@@ -5,7 +5,7 @@ void main() {
   group('Error State Handling Tests', () {
     group('Machine Identifier Parsing Errors', () {
       test('Should handle null machine identifier', () {
-        final parser = HiddenLogoParser.initialized(machineIdentifier: null);
+        final parser = HiddenLogoParser(machineIdentifier: null);
 
         expect(parser.currentIPhone, isNull);
         expect(parser.isTargetIPhone, isFalse);
@@ -13,11 +13,11 @@ void main() {
         expect(parser.logoConstraints.maxWidth, equals(0));
       });
 
-      test('Should handle empty machine identifier', () {
-        final parser = HiddenLogoParser(machineIdentifier: '');
-
-        expect(parser.currentIPhone, isNull);
-        expect(parser.isTargetIPhone, isFalse);
+      test('Should throw assertion error for empty machine identifier', () {
+        expect(
+          () => HiddenLogoParser(machineIdentifier: ''),
+          throwsAssertionError,
+        );
       });
 
       test('Should handle very short machine identifier', () {
@@ -69,19 +69,22 @@ void main() {
         expect(parser.isTargetIPhone, isFalse);
       });
 
-      test('Should handle device code with whitespace', () {
-        final parser = HiddenLogoParser(machineIdentifier: 'iPhone 15,2');
-
-        expect(parser.currentIPhone, isNull);
-        expect(parser.isTargetIPhone, isFalse);
+      test('Should throw assertion error for device code with whitespace', () {
+        expect(
+          () => HiddenLogoParser(machineIdentifier: 'iPhone 15,2'),
+          throwsAssertionError,
+        );
       });
 
-      test('Should handle device code with leading whitespace', () {
-        final parser = HiddenLogoParser(machineIdentifier: ' iPhone15,2');
-
-        expect(parser.currentIPhone, isNull);
-        expect(parser.isTargetIPhone, isFalse);
-      });
+      test(
+        'Should throw assertion error for device code with leading whitespace',
+        () {
+          expect(
+            () => HiddenLogoParser(machineIdentifier: ' iPhone15,2'),
+            throwsAssertionError,
+          );
+        },
+      );
 
       test('Should handle device code with dot instead of comma', () {
         final parser = HiddenLogoParser(machineIdentifier: 'iPhone15.2');

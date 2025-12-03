@@ -6,7 +6,7 @@ import '../utils.dart';
 void main() {
   group('Handle cases when unable to fetch valid iPhone\'s code', () {
     test('Should return null if machine identifier is null', () {
-      final parser = HiddenLogoParser.initialized(machineIdentifier: null);
+      final parser = HiddenLogoParser(machineIdentifier: null);
       expect(parser.currentIPhone, null);
     });
 
@@ -15,9 +15,11 @@ void main() {
       expect(parser.currentIPhone, null);
     });
 
-    test('Should return null if code is empty', () {
-      final parser = HiddenLogoParser(machineIdentifier: '');
-      expect(parser.currentIPhone, null);
+    test('Should throw assertion error if code is empty', () {
+      expect(
+        () => HiddenLogoParser(machineIdentifier: ''),
+        throwsAssertionError,
+      );
     });
 
     test('Should return null if code is unknown', () {
@@ -35,9 +37,11 @@ void main() {
       expect(parser.currentIPhone, null);
     });
 
-    test('Should return null if code has a whitespace', () {
-      final parser = HiddenLogoParser(machineIdentifier: 'iPhone 10,6');
-      expect(parser.currentIPhone, null);
+    test('Should throw assertion error if code has a whitespace', () {
+      expect(
+        () => HiddenLogoParser(machineIdentifier: 'iPhone 10,6'),
+        throwsAssertionError,
+      );
     });
 
     test('Should return null for simulator identifiers', () {
@@ -138,7 +142,7 @@ void main() {
     testLogoTypeParsing(DeviceModel.iPhone17ProMax, LogoType.dynamicIsland);
 
     test('Should throw assertion error when device is not supported', () {
-      final parser = HiddenLogoParser.initialized(machineIdentifier: null);
+      final parser = HiddenLogoParser(machineIdentifier: null);
       expect(() => parser.iPhonesLogoType, throwsAssertionError);
     });
   });

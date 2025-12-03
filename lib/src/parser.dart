@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
@@ -146,8 +144,9 @@ enum DeviceModel {
 /// display child widget for HiddenLogo for current device.
 /// {@endtemplate}
 class HiddenLogoParser {
-  /// Centralized mapping of device codes to iPhone models
-  static const Map<String, DeviceModel> _deviceCodeMap = {
+  /// Mapping of iPhone machine identifier suffixes to device models.
+  /// Keys are the numeric part after "iPhone" prefix (e.g., "15,2" for iPhone 14 Pro).
+  static const Map<String, DeviceModel> _iPhoneMachineIdentifiersMap = {
     '10,6': DeviceModel.iPhoneX,
     '11,2': DeviceModel.iPhoneXs,
     '11,4': DeviceModel.iPhoneXsMax,
@@ -183,24 +182,24 @@ class HiddenLogoParser {
     '18,4': DeviceModel.iPhoneAir,
   };
 
-  /// Returns the device code string for a given iPhone model.
+  /// Returns the machine identifier suffix for a given iPhone model.
   ///
   /// This method is primarily used for testing purposes to convert from
-  /// a [DeviceModel] enum value back to its corresponding device code string.
+  /// a [DeviceModel] enum value back to its corresponding identifier suffix.
   ///
   /// For example:
   /// ```dart
-  /// final code = HiddenLogoParser.getDeviceCode(DeviceModel.iPhoneX);
-  /// print(code); // "10,6"
+  /// final id = HiddenLogoParser.getIPhoneMachineIdentifier(DeviceModel.iPhoneX);
+  /// print(id); // "10,6"
   /// ```
   ///
   /// Returns `null` if the iPhone model is not found in the mapping.
   ///
   /// See also:
-  /// * [currentIPhone] for the reverse operation (code to model)
-  static String? getDeviceCode(DeviceModel iPhone) {
+  /// * [currentIPhone] for the reverse operation (identifier to model)
+  static String? getIPhoneMachineIdentifier(DeviceModel iPhone) {
     try {
-      return _deviceCodeMap.entries
+      return _iPhoneMachineIdentifiersMap.entries
           .firstWhere((entry) => entry.value == iPhone)
           .key;
     } catch (_) {
@@ -210,47 +209,28 @@ class HiddenLogoParser {
 
   /// {@macro hidden_logo.HiddenLogoParser}
   ///
-  /// If [machineIdentifier] is provided (including null), the parser is
-  /// immediately initialized. If not provided, use the [machineIdentifier]
-  /// setter to initialize before accessing device properties.
-  HiddenLogoParser({
-    String? machineIdentifier,
-    bool initializeWithValue = false,
-  }) {
-    // If machineIdentifier is explicitly provided OR initializeWithValue is true,
-    // mark as initialized
-    if (initializeWithValue || machineIdentifier != null) {
-      _machineIdentifier = machineIdentifier;
-      _initializationCompleter.complete();
-    }
-  }
-
-  /// Creates an initialized parser with the given machine identifier.
-  /// Use this factory when you have the identifier value (including null).
-  factory HiddenLogoParser.initialized({String? machineIdentifier}) {
-    return HiddenLogoParser(
-      machineIdentifier: machineIdentifier,
-      initializeWithValue: true,
-    );
-  }
+  /// The [machineIdentifier] should be either:
+  /// - `null` for non-iOS platforms or when device info is unavailable
+  /// - A valid iOS machine identifier string (e.g., "iPhone15,2", "x86_64")
+  ///
+  /// Use `null` instead of empty string when no identifier is available.
+  HiddenLogoParser({required this.machineIdentifier})
+    : assert(
+        machineIdentifier == null || machineIdentifier.isNotEmpty,
+        'machineIdentifier must not be empty, use null instead',
+      ),
+      assert(
+        machineIdentifier == null ||
+            machineIdentifier.trim() == machineIdentifier,
+        'machineIdentifier must not have leading or trailing whitespace',
+      ),
+      assert(
+        machineIdentifier == null || !machineIdentifier.contains(' '),
+        'machineIdentifier must not contain whitespace',
+      );
 
   /// iOS machine identifier (e.g., "iPhone15,2")
-  String? _machineIdentifier;
-  final _initializationCompleter = Completer<void>();
-
-  /// Returns true if machine identifier is initialized
-  bool get isInitialized => _initializationCompleter.isCompleted;
-
-  /// Sets the machine identifier. Can only be called once.
-  set machineIdentifier(String? value) {
-    if (_initializationCompleter.isCompleted) {
-      throw StateError(
-        'HiddenLogoParser is already initialized, set machineIdentifier only once!',
-      );
-    }
-    _machineIdentifier = value;
-    _initializationCompleter.complete();
-  }
+  final String? machineIdentifier;
 
   /// Whether the current device is a supported iPhone model.
   ///
@@ -318,24 +298,15 @@ class HiddenLogoParser {
   ///   // Handle iPhone X specific logic
   /// }
   /// ```
-  ///
-  /// **Note**: The parser must be initialized before calling this getter.
-  /// Use [isInitialized] to check initialization status.
   DeviceModel? get currentIPhone {
-    if (!_initializationCompleter.isCompleted) {
-      throw StateError(
-        'HiddenLogoParser is not initialized, set machineIdentifier first!',
-      );
-    }
-
-    final machineId = _machineIdentifier;
+    final machineId = machineIdentifier;
     if (machineId == null || machineId.isEmpty) return null;
     if (!machineId.startsWith('iPhone')) return null;
 
     try {
-      final deviceCode = machineId.substring('iPhone'.length);
-      if (deviceCode.isEmpty) return null;
-      return _deviceCodeMap[deviceCode];
+      final id = machineId.substring('iPhone'.length);
+      if (id.isEmpty) return null;
+      return _iPhoneMachineIdentifiersMap[id];
     } on RangeError catch (_) {
       return null;
     } catch (_) {

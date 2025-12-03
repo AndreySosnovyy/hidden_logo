@@ -10,7 +10,6 @@ import '../utils.dart';
 
 class EmptyAppWithHiddenLogo extends StatefulWidget {
   const EmptyAppWithHiddenLogo({
-    this.parser,
     this.isVisible = true,
     this.visibilityMode = LogoVisibilityMode.always,
     this.dynamicIslandKey,
@@ -23,7 +22,6 @@ class EmptyAppWithHiddenLogo extends StatefulWidget {
   final Key? dynamicIslandKey;
   final bool isVisible;
   final LogoVisibilityMode visibilityMode;
-  final HiddenLogoParser? parser;
   final bool isIOS;
 
   @override
@@ -44,7 +42,6 @@ class _EmptyAppWithHiddenLogoState extends State<EmptyAppWithHiddenLogo> {
       home: const Scaffold(),
       builder: (context, child) {
         return HiddenLogoBase(
-          parser: widget.parser ?? HiddenLogoParser(),
           isVisible: widget.isVisible,
           visibilityMode: widget.visibilityMode,
           notchBuilder: (_, __) => SizedBox.shrink(key: widget.notchKey),
@@ -479,16 +476,15 @@ void main() {
     ) async {
       await setOrientation(Orientation.portrait);
       DeviceInfoService.setMockMachineIdentifier('iPhone15,2'); // iPhone 14 Pro
-      final parser = HiddenLogoParser(machineIdentifier: 'iPhone15,2');
       await tester.pumpWidget(
-        EmptyAppWithHiddenLogo(
-          parser: parser,
-          dynamicIslandKey: const ValueKey('dynamic_island'),
+        const EmptyAppWithHiddenLogo(
+          dynamicIslandKey: ValueKey('dynamic_island'),
         ),
       );
       await tester.pumpAndSettle();
 
       // Verify positioning with expected top margin (11.3 for iPhone 14 Pro)
+      final parser = HiddenLogoParser(machineIdentifier: 'iPhone15,2');
       expect(parser.dynamicIslandTopMargin, equals(11.3));
     });
 
@@ -544,15 +540,12 @@ void main() {
         await setOrientation(Orientation.portrait);
         const dynamicIslandKey = ValueKey('dynamic_island');
         DeviceInfoService.setMockMachineIdentifier(deviceCode);
-        final parser = HiddenLogoParser(machineIdentifier: deviceCode);
         await tester.pumpWidget(
-          EmptyAppWithHiddenLogo(
-            parser: parser,
-            dynamicIslandKey: dynamicIslandKey,
-          ),
+          const EmptyAppWithHiddenLogo(dynamicIslandKey: dynamicIslandKey),
         );
         await tester.pumpAndSettle();
         expect(find.byKey(dynamicIslandKey), findsOneWidget);
+        final parser = HiddenLogoParser(machineIdentifier: deviceCode);
         expect(parser.iPhonesLogoType, equals(LogoType.dynamicIsland));
       });
     });

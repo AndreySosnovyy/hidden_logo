@@ -10,7 +10,6 @@ class HiddenLogoBase extends StatefulWidget {
     required this.body,
     required this.notchBuilder,
     required this.dynamicIslandBuilder,
-    required this.parser,
     this.visibilityMode = LogoVisibilityMode.always,
     this.isVisible = true,
     super.key,
@@ -21,7 +20,6 @@ class HiddenLogoBase extends StatefulWidget {
   final LogoBuilder dynamicIslandBuilder;
   final LogoVisibilityMode visibilityMode;
   final bool isVisible;
-  final HiddenLogoParser parser;
 
   @override
   State<HiddenLogoBase> createState() => _HiddenLogoBaseState();
@@ -31,14 +29,15 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
     with WidgetsBindingObserver {
   late bool _isForeground;
   late final Future<String?> _machineIdFuture;
+  HiddenLogoParser? _parser;
 
   @override
   void initState() {
+    super.initState();
     WidgetsBinding.instance.addObserver(this);
     _isForeground =
         WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
     _machineIdFuture = DeviceInfoService.getMachineIdentifier();
-    super.initState();
   }
 
   @override
@@ -46,13 +45,11 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
     switch (state) {
       case AppLifecycleState.resumed:
         _isForeground = true;
-        break;
       case AppLifecycleState.inactive:
       case AppLifecycleState.detached:
       case AppLifecycleState.hidden:
       case AppLifecycleState.paused:
         _isForeground = false;
-        break;
     }
     super.didChangeAppLifecycleState(state);
     setState(() {});
@@ -69,14 +66,13 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
             if (snapshot.connectionState != ConnectionState.done) {
               return widget.body;
             }
-            if (!widget.parser.isInitialized) {
-              widget.parser.machineIdentifier = snapshot.data;
-            }
-            final constraints = widget.parser.logoConstraints;
+            _parser ??= HiddenLogoParser(machineIdentifier: snapshot.data);
+            final parser = _parser!;
+            final constraints = parser.logoConstraints;
             return Stack(
               children: [
                 widget.body,
-                if (widget.parser.isTargetDevice &&
+                if (parser.isTargetDevice &&
                     widget.isVisible &&
                     (widget.visibilityMode == LogoVisibilityMode.always ||
                         !_isForeground) &&
@@ -86,10 +82,10 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
                     alignment: Alignment.topCenter,
                     child: Padding(
                       padding: EdgeInsets.only(
-                        top: widget.parser.dynamicIslandTopMargin,
+                        top: parser.dynamicIslandTopMargin,
                       ),
                       child:
-                          widget.parser.iPhonesLogoType == LogoType.notch
+                          parser.iPhonesLogoType == LogoType.notch
                               ? widget.notchBuilder(context, constraints)
                               : ClipRRect(
                                 borderRadius: const BorderRadius.all(
