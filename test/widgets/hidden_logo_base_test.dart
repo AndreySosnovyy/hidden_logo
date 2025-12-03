@@ -45,8 +45,8 @@ class _EmptyAppWithHiddenLogoState extends State<EmptyAppWithHiddenLogo> {
           isVisible: widget.isVisible,
           visibilityMode: widget.visibilityMode,
           notchBuilder: (_, __) => SizedBox.shrink(key: widget.notchKey),
-          dynamicIslandBuilder:
-              (_, __) => SizedBox.shrink(key: widget.dynamicIslandKey),
+          dynamicIslandBuilder: (_, __) =>
+              SizedBox.shrink(key: widget.dynamicIslandKey),
           body: child!,
         );
       },
@@ -82,6 +82,24 @@ void main() {
       TestUtils.getMachineIdentifier(
         TestUtils.getRandomIPhone(logoType: logoType),
       );
+
+  group('FutureBuilder loading state', () {
+    testWidgets('Should display body while device info is loading', (
+      tester,
+    ) async {
+      await setOrientation(Orientation.portrait);
+      const notchKey = ValueKey('notch');
+      // Reset without setting mock - simulates loading state
+      DeviceInfoService.reset();
+      await tester.pumpWidget(const EmptyAppWithHiddenLogo(notchKey: notchKey));
+      // Just pump once, don't wait for future to complete
+      await tester.pump();
+      // Body should be visible (Scaffold exists)
+      expect(find.byType(Scaffold), findsOneWidget);
+      // Logo should not be visible yet (still loading)
+      expect(find.byKey(notchKey), findsNothing);
+    });
+  });
 
   group('HiddenLogo visibility', () {
     testWidgets(
@@ -549,5 +567,98 @@ void main() {
         expect(parser.iPhonesLogoType, equals(LogoType.dynamicIsland));
       });
     });
+  });
+
+  group('Dynamic Island ClipRRect', () {
+    testWidgets(
+        'Dynamic Island logo should have ClipRRect with rounded corners',
+        (tester) async {
+      await setOrientation(Orientation.portrait);
+      const dynamicIslandKey = ValueKey('dynamic_island');
+      DeviceInfoService.setMockMachineIdentifier('iPhone15,2');
+      await tester.pumpWidget(
+        const EmptyAppWithHiddenLogo(dynamicIslandKey: dynamicIslandKey),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(ClipRRect), findsOneWidget);
+    });
+
+    testWidgets('Notch logo should not have ClipRRect', (tester) async {
+      await setOrientation(Orientation.portrait);
+      const notchKey = ValueKey('notch');
+      DeviceInfoService.setMockMachineIdentifier('iPhone10,6');
+      await tester.pumpWidget(const EmptyAppWithHiddenLogo(notchKey: notchKey));
+      await tester.pumpAndSettle();
+      expect(find.byType(ClipRRect), findsNothing);
+    });
+  });
+
+  group('Additional lifecycle states', () {
+    testWidgets(
+      'Logo should be shown when app becomes inactive with onlyInBackground mode',
+      (tester) async {
+        await setOrientation(Orientation.portrait);
+        const notchKey = ValueKey('notch');
+        DeviceInfoService.setMockMachineIdentifier(
+          getRandomMachineIdentifier(logoType: LogoType.notch),
+        );
+        await tester.pumpWidget(
+          const EmptyAppWithHiddenLogo(
+            notchKey: notchKey,
+            visibilityMode: LogoVisibilityMode.onlyInBackground,
+          ),
+        );
+        await tester.pumpAndSettle();
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.inactive,
+        );
+        await tester.pumpAndSettle();
+        expect(find.byKey(notchKey), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Logo should be shown when app becomes hidden with onlyInBackground mode',
+      (tester) async {
+        await setOrientation(Orientation.portrait);
+        const notchKey = ValueKey('notch');
+        DeviceInfoService.setMockMachineIdentifier(
+          getRandomMachineIdentifier(logoType: LogoType.notch),
+        );
+        await tester.pumpWidget(
+          const EmptyAppWithHiddenLogo(
+            notchKey: notchKey,
+            visibilityMode: LogoVisibilityMode.onlyInBackground,
+          ),
+        );
+        await tester.pumpAndSettle();
+        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+        await tester.pumpAndSettle();
+        expect(find.byKey(notchKey), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Logo should be shown when app becomes detached with onlyInBackground mode',
+      (tester) async {
+        await setOrientation(Orientation.portrait);
+        const notchKey = ValueKey('notch');
+        DeviceInfoService.setMockMachineIdentifier(
+          getRandomMachineIdentifier(logoType: LogoType.notch),
+        );
+        await tester.pumpWidget(
+          const EmptyAppWithHiddenLogo(
+            notchKey: notchKey,
+            visibilityMode: LogoVisibilityMode.onlyInBackground,
+          ),
+        );
+        await tester.pumpAndSettle();
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.detached,
+        );
+        await tester.pumpAndSettle();
+        expect(find.byKey(notchKey), findsOneWidget);
+      },
+    );
   });
 }

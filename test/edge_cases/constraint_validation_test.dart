@@ -4,57 +4,6 @@ import 'package:hidden_logo/src/parser.dart';
 
 void main() {
   group('Constraint Validation Tests', () {
-    group('Invalid Constraint Scenarios', () {
-      test('Should return zero constraints for null device', () {
-        final parser = HiddenLogoParser(machineIdentifier: null);
-
-        final constraints = parser.logoConstraints;
-        expect(constraints.maxHeight, equals(0));
-        expect(constraints.maxWidth, equals(0));
-        expect(constraints.minHeight, equals(0));
-        expect(constraints.minWidth, equals(0));
-      });
-
-      test('Should return valid BoxConstraints for all known devices', () {
-        final allDeviceCodes = [
-          'iPhone10,6', // iPhone X
-          'iPhone11,2', // iPhone Xs
-          'iPhone15,2', // iPhone 14 Pro
-          'iPhone16,1', // iPhone 15 Pro
-          'iPhone17,1', // iPhone 16 Pro
-          'iPhone18,1', // iPhone 17 Pro
-        ];
-
-        for (final deviceCode in allDeviceCodes) {
-          final parser = HiddenLogoParser(machineIdentifier: deviceCode);
-
-          final constraints = parser.logoConstraints;
-
-          // All constraints should be positive and reasonable
-          expect(
-            constraints.maxHeight,
-            greaterThan(0),
-            reason: 'Height should be positive for $deviceCode',
-          );
-          expect(
-            constraints.maxWidth,
-            greaterThan(0),
-            reason: 'Width should be positive for $deviceCode',
-          );
-          expect(
-            constraints.maxHeight,
-            lessThan(100),
-            reason: 'Height should be reasonable for $deviceCode',
-          );
-          expect(
-            constraints.maxWidth,
-            lessThan(500),
-            reason: 'Width should be reasonable for $deviceCode',
-          );
-        }
-      });
-    });
-
     group('Constraint Boundary Testing', () {
       test('Should have consistent constraint properties', () {
         final parser = HiddenLogoParser(machineIdentifier: 'iPhone15,2');
@@ -91,58 +40,6 @@ void main() {
           notchConstraints.maxHeight,
           isNot(equals(dynamicIslandConstraints.maxHeight)),
         );
-      });
-    });
-
-    group('Dynamic Island Top Margin Validation', () {
-      test('Should return zero margin for notch devices', () {
-        final notchDevices = [
-          'iPhone10,6',
-          'iPhone11,2',
-          'iPhone12,1',
-          'iPhone13,1',
-        ];
-
-        for (final deviceCode in notchDevices) {
-          final parser = HiddenLogoParser(machineIdentifier: deviceCode);
-
-          expect(
-            parser.dynamicIslandTopMargin,
-            equals(0),
-            reason: 'Notch device $deviceCode should have zero top margin',
-          );
-        }
-      });
-
-      test('Should return positive margin for Dynamic Island devices', () {
-        final dynamicIslandDevices = [
-          'iPhone15,2',
-          'iPhone16,1',
-          'iPhone17,1',
-          'iPhone18,4',
-        ];
-
-        for (final deviceCode in dynamicIslandDevices) {
-          final parser = HiddenLogoParser(machineIdentifier: deviceCode);
-
-          expect(
-            parser.dynamicIslandTopMargin,
-            greaterThan(0),
-            reason:
-                'Dynamic Island device $deviceCode should have positive top margin',
-          );
-          expect(
-            parser.dynamicIslandTopMargin,
-            lessThan(50),
-            reason: 'Top margin should be reasonable for $deviceCode',
-          );
-        }
-      });
-
-      test('Should return zero margin for unknown devices', () {
-        final parser = HiddenLogoParser(machineIdentifier: null);
-
-        expect(parser.dynamicIslandTopMargin, equals(0));
       });
     });
 

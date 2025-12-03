@@ -60,17 +60,11 @@ class TestUtils {
   ];
 
   static DeviceModel getRandomIPhone({LogoType? logoType}) {
-    final List<DeviceModel> listToChooseFrom;
-    switch (logoType) {
-      case LogoType.notch:
-        listToChooseFrom = [..._iPhonesWithNotch];
-        break;
-      case LogoType.dynamicIsland:
-        listToChooseFrom = [..._iPhonesWithDynamicIsland];
-        break;
-      default:
-        listToChooseFrom = [..._iPhonesWithNotch, ..._iPhonesWithDynamicIsland];
-    }
+    final listToChooseFrom = switch (logoType) {
+      LogoType.notch => [..._iPhonesWithNotch],
+      LogoType.dynamicIsland => [..._iPhonesWithDynamicIsland],
+      null => [..._iPhonesWithNotch, ..._iPhonesWithDynamicIsland],
+    };
     return (listToChooseFrom..shuffle()).first;
   }
 }

@@ -44,6 +44,20 @@ void main() {
       );
     });
 
+    test('Should throw assertion error if code has trailing whitespace', () {
+      expect(
+        () => HiddenLogoParser(machineIdentifier: 'iPhone15,2 '),
+        throwsAssertionError,
+      );
+    });
+
+    test('Should throw assertion error if code has leading whitespace', () {
+      expect(
+        () => HiddenLogoParser(machineIdentifier: ' iPhone15,2'),
+        throwsAssertionError,
+      );
+    });
+
     test('Should return null for simulator identifiers', () {
       final parserX86 = HiddenLogoParser(machineIdentifier: 'x86_64');
       expect(parserX86.currentIPhone, null);
@@ -144,6 +158,29 @@ void main() {
     test('Should throw assertion error when device is not supported', () {
       final parser = HiddenLogoParser(machineIdentifier: null);
       expect(() => parser.iPhonesLogoType, throwsAssertionError);
+    });
+  });
+
+  group('getIPhoneMachineIdentifier static method', () {
+    test('Should return correct code for known device', () {
+      final code = HiddenLogoParser.getIPhoneMachineIdentifier(
+        DeviceModel.iPhoneX,
+      );
+      expect(code, '10,6');
+    });
+
+    test('Should return code that can be used to get device back', () {
+      for (final device in DeviceModel.values) {
+        final code = HiddenLogoParser.getIPhoneMachineIdentifier(device);
+        expect(code, isNotNull, reason: '$device should have a code');
+
+        final parser = HiddenLogoParser(machineIdentifier: 'iPhone$code');
+        expect(
+          parser.currentIPhone,
+          device,
+          reason: 'Code $code should map back to $device',
+        );
+      }
     });
   });
 }

@@ -10,7 +10,8 @@ void main() {
       DeviceModel iPhone,
       BoxConstraints expectedConstraints,
     ) {
-      test('When device is ${iPhone.name}, '
+      test(
+          'When device is ${iPhone.name}, '
           'constraints should be $expectedConstraints', () {
         final machineId = TestUtils.getMachineIdentifier(iPhone);
         final parser = HiddenLogoParser(machineIdentifier: machineId);
@@ -69,7 +70,8 @@ void main() {
 
   group('Get dynamic island logo top margin from parser', () {
     void testTopMarginParsing(DeviceModel iPhone, double expectedMargin) {
-      test('When device is ${iPhone.name}, '
+      test(
+          'When device is ${iPhone.name}, '
           'top margin should be $expectedMargin', () {
         final machineId = TestUtils.getMachineIdentifier(iPhone);
         final parser = HiddenLogoParser(machineIdentifier: machineId);
