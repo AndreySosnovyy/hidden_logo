@@ -1,63 +1,76 @@
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hidden_logo/src/parser.dart';
-import 'package:mocktail/mocktail.dart';
 
 import '../utils.dart';
 
-class MockBaseDeviceInfo extends Mock implements BaseDeviceInfo {}
-
 void main() {
-  final mockBaseDeviceInfo = MockBaseDeviceInfo();
-  final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-
   group('Handle cases when unable to fetch valid iPhone\'s code', () {
-    test('Should return null if data map is empty', () {
-      when(() => mockBaseDeviceInfo.data).thenReturn({});
+    test('Should return null if machine identifier is null', () {
+      final parser = HiddenLogoParser(machineIdentifier: null);
       expect(parser.currentIPhone, null);
     });
-    test('Should return null if code is in unexpected format', () {
-      when(() => mockBaseDeviceInfo.data)
-          .thenReturn(TestUtils.buildMockDeviceInfoDataMap('10,6'));
+
+    test('Should return null if code is in unexpected format (no prefix)', () {
+      final parser = HiddenLogoParser(machineIdentifier: '10,6');
       expect(parser.currentIPhone, null);
     });
-    test('Should return null if code is empty', () {
-      when(() => mockBaseDeviceInfo.data)
-          .thenReturn(TestUtils.buildMockDeviceInfoDataMap(''));
-      expect(parser.currentIPhone, null);
+
+    test('Should throw assertion error if code is empty', () {
+      expect(
+        () => HiddenLogoParser(machineIdentifier: ''),
+        throwsAssertionError,
+      );
     });
+
     test('Should return null if code is unknown', () {
-      when(() => mockBaseDeviceInfo.data)
-          .thenReturn(TestUtils.buildMockDeviceInfoDataMap('iPhone52,9'));
+      final parser = HiddenLogoParser(machineIdentifier: 'iPhone52,9');
       expect(parser.currentIPhone, null);
     });
+
     test('Should return null if code has dot instead of comma', () {
-      when(() => mockBaseDeviceInfo.data)
-          .thenReturn(TestUtils.buildMockDeviceInfoDataMap('iPhone10.6'));
+      final parser = HiddenLogoParser(machineIdentifier: 'iPhone10.6');
       expect(parser.currentIPhone, null);
     });
+
     test('Should return null if code is not full', () {
-      when(() => mockBaseDeviceInfo.data)
-          .thenReturn(TestUtils.buildMockDeviceInfoDataMap('iPhone11'));
+      final parser = HiddenLogoParser(machineIdentifier: 'iPhone11');
       expect(parser.currentIPhone, null);
     });
-    test('Should return null if code has a whitespace', () {
-      when(() => mockBaseDeviceInfo.data)
-          .thenReturn(TestUtils.buildMockDeviceInfoDataMap('iPhone 10,6'));
-      expect(parser.currentIPhone, null);
+
+    test('Should throw assertion error if code has a whitespace', () {
+      expect(
+        () => HiddenLogoParser(machineIdentifier: 'iPhone 10,6'),
+        throwsAssertionError,
+      );
     });
-    test('Should return null if code is not String', () {
-      when(() => mockBaseDeviceInfo.data)
-          .thenReturn(TestUtils.buildMockDeviceInfoDataMap(10.6));
-      expect(parser.currentIPhone, null);
+
+    test('Should throw assertion error if code has trailing whitespace', () {
+      expect(
+        () => HiddenLogoParser(machineIdentifier: 'iPhone15,2 '),
+        throwsAssertionError,
+      );
+    });
+
+    test('Should throw assertion error if code has leading whitespace', () {
+      expect(
+        () => HiddenLogoParser(machineIdentifier: ' iPhone15,2'),
+        throwsAssertionError,
+      );
+    });
+
+    test('Should return null for simulator identifiers', () {
+      final parserX86 = HiddenLogoParser(machineIdentifier: 'x86_64');
+      expect(parserX86.currentIPhone, null);
+
+      final parserArm = HiddenLogoParser(machineIdentifier: 'arm64');
+      expect(parserArm.currentIPhone, null);
     });
   });
 
   group('Get iPhones from codes provided by DeviceInfo', () {
     void testCodeParsing(String deviceCode, DeviceModel expectedIphone) {
       test('Should return ${expectedIphone.name} when code is $deviceCode', () {
-        when(() => mockBaseDeviceInfo.data)
-            .thenReturn(TestUtils.buildMockDeviceInfoDataMap(deviceCode));
+        final parser = HiddenLogoParser(machineIdentifier: deviceCode);
         expect(parser.currentIPhone, expectedIphone);
       });
     }
@@ -100,13 +113,13 @@ void main() {
   group('Logo types for iPhones', () {
     void testLogoTypeParsing(DeviceModel iPhone, LogoType expectedLogoType) {
       test(
-          'Should return ${expectedLogoType.name} when iPhone is ${iPhone.name}',
-          () {
-        when(() => mockBaseDeviceInfo.data).thenReturn(
-            TestUtils.buildMockDeviceInfoDataMap(
-                'iPhone${TestUtils.iPhoneToCode(iPhone)}'));
-        expect(parser.iPhonesLogoType, expectedLogoType);
-      });
+        'Should return ${expectedLogoType.name} when iPhone is ${iPhone.name}',
+        () {
+          final machineId = TestUtils.getMachineIdentifier(iPhone);
+          final parser = HiddenLogoParser(machineIdentifier: machineId);
+          expect(parser.iPhonesLogoType, expectedLogoType);
+        },
+      );
     }
 
     testLogoTypeParsing(DeviceModel.iPhoneX, LogoType.notch);
@@ -142,10 +155,32 @@ void main() {
     testLogoTypeParsing(DeviceModel.iPhone17Pro, LogoType.dynamicIsland);
     testLogoTypeParsing(DeviceModel.iPhone17ProMax, LogoType.dynamicIsland);
 
-    test('Should return and assert error when device is not supported',
-        () {
-      when(() => mockBaseDeviceInfo.data).thenReturn({});
+    test('Should throw assertion error when device is not supported', () {
+      final parser = HiddenLogoParser(machineIdentifier: null);
       expect(() => parser.iPhonesLogoType, throwsAssertionError);
+    });
+  });
+
+  group('getIPhoneMachineIdentifier static method', () {
+    test('Should return correct code for known device', () {
+      final code = HiddenLogoParser.getIPhoneMachineIdentifier(
+        DeviceModel.iPhoneX,
+      );
+      expect(code, '10,6');
+    });
+
+    test('Should return code that can be used to get device back', () {
+      for (final device in DeviceModel.values) {
+        final code = HiddenLogoParser.getIPhoneMachineIdentifier(device);
+        expect(code, isNotNull, reason: '$device should have a code');
+
+        final parser = HiddenLogoParser(machineIdentifier: 'iPhone$code');
+        expect(
+          parser.currentIPhone,
+          device,
+          reason: 'Code $code should map back to $device',
+        );
+      }
     });
   });
 }

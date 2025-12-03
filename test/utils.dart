@@ -1,12 +1,20 @@
 import 'package:hidden_logo/src/parser.dart';
 
 class TestUtils {
-  static Map<String, dynamic> buildMockDeviceInfoDataMap(dynamic code) => {
-        'utsname': {'machine': code}
-      };
+  /// Returns the machine identifier string for a given iPhone model.
+  /// Example: DeviceModel.iPhoneX -> "iPhone10,6"
+  static String getMachineIdentifier(DeviceModel iPhone) {
+    final code = HiddenLogoParser.getIPhoneMachineIdentifier(iPhone);
+    if (code == null) {
+      throw ArgumentError('Device code not found for $iPhone');
+    }
+    return 'iPhone$code';
+  }
 
+  /// Returns just the code part without "iPhone" prefix.
+  /// Example: DeviceModel.iPhoneX -> "10,6"
   static String iPhoneToCode(DeviceModel iPhone, {bool withPrefix = false}) {
-    final code = HiddenLogoParser.getDeviceCode(iPhone);
+    final code = HiddenLogoParser.getIPhoneMachineIdentifier(iPhone);
     if (code == null) {
       throw ArgumentError('Device code not found for $iPhone');
     }
@@ -52,17 +60,11 @@ class TestUtils {
   ];
 
   static DeviceModel getRandomIPhone({LogoType? logoType}) {
-    final List<DeviceModel> listToChooseFrom;
-    switch (logoType) {
-      case LogoType.notch:
-        listToChooseFrom = [..._iPhonesWithNotch];
-        break;
-      case LogoType.dynamicIsland:
-        listToChooseFrom = [..._iPhonesWithDynamicIsland];
-        break;
-      default:
-        listToChooseFrom = [..._iPhonesWithNotch, ..._iPhonesWithDynamicIsland];
-    }
+    final listToChooseFrom = switch (logoType) {
+      LogoType.notch => [..._iPhonesWithNotch],
+      LogoType.dynamicIsland => [..._iPhonesWithDynamicIsland],
+      null => [..._iPhonesWithNotch, ..._iPhonesWithDynamicIsland],
+    };
     return (listToChooseFrom..shuffle()).first;
   }
 }

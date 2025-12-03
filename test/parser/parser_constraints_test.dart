@@ -1,17 +1,10 @@
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hidden_logo/src/parser.dart';
-import 'package:mocktail/mocktail.dart';
 
 import '../utils.dart';
 
-class MockBaseDeviceInfo extends Mock implements BaseDeviceInfo {}
-
 void main() {
-  final mockBaseDeviceInfo = MockBaseDeviceInfo();
-  final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-
   group('Get logo constraints from parser', () {
     void testConstraintsParsing(
       DeviceModel iPhone,
@@ -20,9 +13,8 @@ void main() {
       test(
           'When device is ${iPhone.name}, '
           'constraints should be $expectedConstraints', () {
-        when(() => mockBaseDeviceInfo.data).thenReturn(
-            TestUtils.buildMockDeviceInfoDataMap(
-                'iPhone${TestUtils.iPhoneToCode(iPhone)}'));
+        final machineId = TestUtils.getMachineIdentifier(iPhone);
+        final parser = HiddenLogoParser(machineIdentifier: machineId);
         expect(parser.logoConstraints, expectedConstraints);
       });
     }
@@ -67,24 +59,22 @@ void main() {
     testConstraintsParsing(DeviceModel.iPhone17Pro, bc367x1220);
     testConstraintsParsing(DeviceModel.iPhone17ProMax, bc367x1220);
 
-    test('Should return 0x0 BoxConstrains if unable to parse iPhone', () {
-      when(() => parser.currentIPhone).thenReturn(null);
-      expect(parser.logoConstraints,
-          const BoxConstraints(maxHeight: 0, maxWidth: 0));
+    test('Should return 0x0 BoxConstraints if unable to parse iPhone', () {
+      final parser = HiddenLogoParser(machineIdentifier: null);
+      expect(
+        parser.logoConstraints,
+        const BoxConstraints(maxHeight: 0, maxWidth: 0),
+      );
     });
   });
 
   group('Get dynamic island logo top margin from parser', () {
-    void testTopMarginParsing(
-      DeviceModel iPhone,
-      double expectedMargin,
-    ) {
+    void testTopMarginParsing(DeviceModel iPhone, double expectedMargin) {
       test(
           'When device is ${iPhone.name}, '
           'top margin should be $expectedMargin', () {
-        when(() => mockBaseDeviceInfo.data).thenReturn(
-            TestUtils.buildMockDeviceInfoDataMap(
-                'iPhone${TestUtils.iPhoneToCode(iPhone)}'));
+        final machineId = TestUtils.getMachineIdentifier(iPhone);
+        final parser = HiddenLogoParser(machineIdentifier: machineId);
         expect(parser.dynamicIslandTopMargin, expectedMargin);
       });
     }
@@ -123,7 +113,7 @@ void main() {
     testTopMarginParsing(DeviceModel.iPhoneAir, 20.0);
 
     test('Should return 0 top margin if unable to parse iPhone', () {
-      when(() => parser.currentIPhone).thenReturn(null);
+      final parser = HiddenLogoParser(machineIdentifier: null);
       expect(parser.dynamicIslandTopMargin, 0);
     });
   });

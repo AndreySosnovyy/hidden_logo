@@ -1,6 +1,3 @@
-import 'dart:async';
-
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
@@ -147,8 +144,9 @@ enum DeviceModel {
 /// display child widget for HiddenLogo for current device.
 /// {@endtemplate}
 class HiddenLogoParser {
-  /// Centralized mapping of device codes to iPhone models
-  static const Map<String, DeviceModel> _deviceCodeMap = {
+  /// Mapping of iPhone machine identifier suffixes to device models.
+  /// Keys are the numeric part after "iPhone" prefix (e.g., "15,2" for iPhone 14 Pro).
+  static const Map<String, DeviceModel> _iPhoneMachineIdentifiersMap = {
     '10,6': DeviceModel.iPhoneX,
     '11,2': DeviceModel.iPhoneXs,
     '11,4': DeviceModel.iPhoneXsMax,
@@ -184,55 +182,55 @@ class HiddenLogoParser {
     '18,4': DeviceModel.iPhoneAir,
   };
 
-  /// Returns the device code string for a given iPhone model.
+  /// Returns the machine identifier suffix for a given iPhone model.
   ///
   /// This method is primarily used for testing purposes to convert from
-  /// a [DeviceModel] enum value back to its corresponding device code string.
+  /// a [DeviceModel] enum value back to its corresponding identifier suffix.
   ///
   /// For example:
   /// ```dart
-  /// final code = HiddenLogoParser.getDeviceCode(DeviceModel.iPhoneX);
-  /// print(code); // "10,6"
+  /// final id = HiddenLogoParser.getIPhoneMachineIdentifier(DeviceModel.iPhoneX);
+  /// print(id); // "10,6"
   /// ```
   ///
   /// Returns `null` if the iPhone model is not found in the mapping.
   ///
   /// See also:
-  /// * [currentIPhone] for the reverse operation (code to model)
-  static String? getDeviceCode(DeviceModel iPhone) {
+  /// * [currentIPhone] for the reverse operation (identifier to model)
+  static String? getIPhoneMachineIdentifier(DeviceModel iPhone) {
     try {
-      return _deviceCodeMap.entries
+      return _iPhoneMachineIdentifiersMap.entries
           .firstWhere((entry) => entry.value == iPhone)
           .key;
     } catch (_) {
       return null;
     }
   }
+
   /// {@macro hidden_logo.HiddenLogoParser}
-  HiddenLogoParser({
-    BaseDeviceInfo? deviceInfo,
-  }) {
-    if (deviceInfo != null) {
-      _deviceInfo = deviceInfo;
-      _deviceInfoInitializationCompleter.complete();
-    }
-  }
+  ///
+  /// The [machineIdentifier] should be either:
+  /// - `null` for non-iOS platforms or when device info is unavailable
+  /// - A valid iOS machine identifier string (e.g., "iPhone15,2", "x86_64")
+  ///
+  /// Use `null` instead of empty string when no identifier is available.
+  HiddenLogoParser({required this.machineIdentifier})
+    : assert(
+        machineIdentifier == null || machineIdentifier.isNotEmpty,
+        'machineIdentifier must not be empty, use null instead',
+      ),
+      assert(
+        machineIdentifier == null ||
+            machineIdentifier.trim() == machineIdentifier,
+        'machineIdentifier must not have leading or trailing whitespace',
+      ),
+      assert(
+        machineIdentifier == null || !machineIdentifier.contains(' '),
+        'machineIdentifier must not contain whitespace',
+      );
 
-  /// Information about current device provided by DeviceInfoPlugin
-  late final BaseDeviceInfo _deviceInfo;
-  final _deviceInfoInitializationCompleter = Completer<void>();
-
-  /// Returns true if _deviceInfo property is initialized
-  bool get isDeviceInfoSet => _deviceInfoInitializationCompleter.isCompleted;
-
-  set deviceInfo(BaseDeviceInfo value) {
-    if (_deviceInfoInitializationCompleter.isCompleted) {
-      throw StateError(
-          'HiddenLogoParser\'s _deviceInfo property is already initialized, set it only once!');
-    }
-    _deviceInfo = value;
-    _deviceInfoInitializationCompleter.complete();
-  }
+  /// iOS machine identifier (e.g., "iPhone15,2")
+  final String? machineIdentifier;
 
   /// Whether the current device is a supported iPhone model.
   ///
@@ -286,7 +284,7 @@ class HiddenLogoParser {
 
   /// The specific iPhone model of the current device.
   ///
-  /// Parses the device information to determine which iPhone model is currently
+  /// Parses the machine identifier to determine which iPhone model is currently
   /// running the app. Returns `null` for non-iPhone devices or unsupported models.
   ///
   /// The detection is based on the device's machine identifier (e.g., "iPhone10,6"
@@ -300,35 +298,20 @@ class HiddenLogoParser {
   ///   // Handle iPhone X specific logic
   /// }
   /// ```
-  ///
-  /// **Note**: The device info must be initialized before calling this getter.
-  /// Use [isDeviceInfoSet] to check initialization status.
   DeviceModel? get currentIPhone {
-    if (!_deviceInfoInitializationCompleter.isCompleted) {
-      throw StateError(
-          'HiddenLogoParser\'s _deviceInfo property is not initialized, set it first!');
-    }
-    late final String deviceName;
-    late final String deviceCode;
+    final machineId = machineIdentifier;
+    if (machineId == null || machineId.isEmpty) return null;
+    if (!machineId.startsWith('iPhone')) return null;
+
     try {
-      deviceName = _deviceInfo.data['utsname']['machine'];
-      if (!deviceName.startsWith('iPhone')) return null;
-      deviceCode = deviceName.substring('iPhone'.length);
-    } on TypeError catch (_) {
-      // Handles cases where data structure is unexpected (e.g., null values, wrong types)
-      return null;
-    } on NoSuchMethodError catch (_) {
-      // Handles cases where expected methods don't exist (e.g., data is not a Map)
-      return null;
+      final id = machineId.substring('iPhone'.length);
+      if (id.isEmpty) return null;
+      return _iPhoneMachineIdentifiersMap[id];
     } on RangeError catch (_) {
-      // Handles cases where substring operation fails due to invalid indices
       return null;
     } catch (_) {
-      // Fallback for any other unexpected exceptions
       return null;
     }
-    if (deviceName.isEmpty || deviceCode.isEmpty) return null;
-    return _deviceCodeMap[deviceCode];
   }
 
   /// Whether the current device supports logo placement.

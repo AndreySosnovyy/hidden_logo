@@ -4,9 +4,7 @@ import 'package:hidden_logo/hidden_logo.dart';
 import 'package:hidden_logo/src/base.dart';
 
 class EmptyAppWithHiddenLogo extends StatelessWidget {
-  const EmptyAppWithHiddenLogo({
-    super.key,
-  });
+  const EmptyAppWithHiddenLogo({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,15 +22,17 @@ class EmptyAppWithHiddenLogo extends StatelessWidget {
 }
 
 void main() {
-  testWidgets('HiddenLogo should build a HiddenLogoBase widget',
-      (tester) async {
+  testWidgets('HiddenLogo should build a HiddenLogoBase widget', (
+    tester,
+  ) async {
     await tester.pumpWidget(const EmptyAppWithHiddenLogo());
     await tester.pumpAndSettle();
     expect(find.byType(HiddenLogoBase), findsOneWidget);
   });
 
-  testWidgets('HiddenLogo parameters should be passed to HiddenLogoBase',
-      (tester) async {
+  testWidgets('HiddenLogo parameters should be passed to HiddenLogoBase', (
+    tester,
+  ) async {
     await tester.pumpWidget(const EmptyAppWithHiddenLogo());
     await tester.pumpAndSettle();
     final wrapperFinder = find.byType(HiddenLogo);

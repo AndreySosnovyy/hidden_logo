@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs
 
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hidden_logo/src/device_info_service.dart';
 import 'package:hidden_logo/src/parser.dart';
 import 'package:hidden_logo/src/wrapper.dart';
 
@@ -12,8 +12,6 @@ class HiddenLogoBase extends StatefulWidget {
     required this.dynamicIslandBuilder,
     this.visibilityMode = LogoVisibilityMode.always,
     this.isVisible = true,
-    required this.deviceInfoPlugin,
-    required this.parser,
     super.key,
   });
 
@@ -22,8 +20,6 @@ class HiddenLogoBase extends StatefulWidget {
   final LogoBuilder dynamicIslandBuilder;
   final LogoVisibilityMode visibilityMode;
   final bool isVisible;
-  final DeviceInfoPlugin deviceInfoPlugin;
-  final HiddenLogoParser parser;
 
   @override
   State<HiddenLogoBase> createState() => _HiddenLogoBaseState();
@@ -32,15 +28,16 @@ class HiddenLogoBase extends StatefulWidget {
 class _HiddenLogoBaseState extends State<HiddenLogoBase>
     with WidgetsBindingObserver {
   late bool _isForeground;
-  late final Future<BaseDeviceInfo> _deviceInfoFuture;
+  late final Future<String?> _machineIdFuture;
+  HiddenLogoParser? _parser;
 
   @override
   void initState() {
+    super.initState();
     WidgetsBinding.instance.addObserver(this);
     _isForeground =
         WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
-    _deviceInfoFuture = widget.deviceInfoPlugin.deviceInfo;
-    super.initState();
+    _machineIdFuture = DeviceInfoService.getMachineIdentifier();
   }
 
   @override
@@ -48,13 +45,11 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
     switch (state) {
       case AppLifecycleState.resumed:
         _isForeground = true;
-        break;
       case AppLifecycleState.inactive:
       case AppLifecycleState.detached:
       case AppLifecycleState.hidden:
       case AppLifecycleState.paused:
         _isForeground = false;
-        break;
     }
     super.didChangeAppLifecycleState(state);
     setState(() {});
@@ -65,22 +60,19 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
     return OrientationBuilder(
       builder: (context, orientation) {
         if (orientation == Orientation.landscape) return widget.body;
-        return FutureBuilder<BaseDeviceInfo>(
-          future: _deviceInfoFuture,
+        return FutureBuilder<String?>(
+          future: _machineIdFuture,
           builder: (context, snapshot) {
-            if (!snapshot.hasData ||
-                snapshot.hasError ||
-                snapshot.data == null) {
+            if (snapshot.connectionState != ConnectionState.done) {
               return widget.body;
             }
-            if (!widget.parser.isDeviceInfoSet) {
-              widget.parser.deviceInfo = snapshot.data!;
-            }
-            final constraints = widget.parser.logoConstraints;
+            _parser ??= HiddenLogoParser(machineIdentifier: snapshot.data);
+            final parser = _parser!;
+            final constraints = parser.logoConstraints;
             return Stack(
               children: [
                 widget.body,
-                if (widget.parser.isTargetDevice &&
+                if (parser.isTargetDevice &&
                     widget.isVisible &&
                     (widget.visibilityMode == LogoVisibilityMode.always ||
                         !_isForeground) &&
@@ -90,22 +82,20 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
                     alignment: Alignment.topCenter,
                     child: Padding(
                       padding: EdgeInsets.only(
-                        top: widget.parser.dynamicIslandTopMargin,
+                        top: parser.dynamicIslandTopMargin,
                       ),
-                      child: widget.parser.iPhonesLogoType == LogoType.notch
-                          ? widget.notchBuilder(
-                              context,
-                              constraints,
-                            )
-                          : ClipRRect(
-                              borderRadius: const BorderRadius.all(
-                                Radius.circular(100.0),
+                      child:
+                          parser.iPhonesLogoType == LogoType.notch
+                              ? widget.notchBuilder(context, constraints)
+                              : ClipRRect(
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(100.0),
+                                ),
+                                child: widget.dynamicIslandBuilder(
+                                  context,
+                                  constraints,
+                                ),
                               ),
-                              child: widget.dynamicIslandBuilder(
-                                context,
-                                constraints,
-                              ),
-                            ),
                     ),
                   ),
               ],

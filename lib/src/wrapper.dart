@@ -1,13 +1,9 @@
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:hidden_logo/src/base.dart';
-import 'package:hidden_logo/src/parser.dart';
 
 /// Logo builder function
-typedef LogoBuilder = Widget Function(
-  BuildContext context,
-  BoxConstraints constraints,
-);
+typedef LogoBuilder =
+    Widget Function(BuildContext context, BoxConstraints constraints);
 
 /// Determines when to show your logo
 enum LogoVisibilityMode {
@@ -59,8 +55,6 @@ class HiddenLogo extends StatelessWidget {
       dynamicIslandBuilder: dynamicIslandBuilder,
       visibilityMode: visibilityMode,
       isVisible: isVisible,
-      deviceInfoPlugin: DeviceInfoPlugin(),
-      parser: HiddenLogoParser(),
     );
   }
 }
