@@ -1,3 +1,2 @@
-library hidden_logo;
-
+export 'src/hidden_logo_stub.dart';
 export 'src/wrapper.dart';

@@ -1,24 +1,16 @@
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hidden_logo/hidden_logo.dart';
 import 'package:hidden_logo/src/base.dart';
+import 'package:hidden_logo/src/device_info_service.dart';
 import 'package:hidden_logo/src/parser.dart';
-import 'package:mocktail/mocktail.dart';
 
 import '../utils.dart';
-
-class MockHiddenLogoParser extends Mock implements HiddenLogoParser {}
-
-class MockBaseDeviceInfo extends Mock implements BaseDeviceInfo {}
-
-class MockDeviceInfoPlugin extends Mock implements DeviceInfoPlugin {}
 
 class EmptyAppWithHiddenLogo extends StatefulWidget {
   const EmptyAppWithHiddenLogo({
     this.parser,
-    this.deviceInfoPlugin,
     this.isVisible = true,
     this.visibilityMode = LogoVisibilityMode.always,
     this.dynamicIslandKey,
@@ -32,7 +24,6 @@ class EmptyAppWithHiddenLogo extends StatefulWidget {
   final bool isVisible;
   final LogoVisibilityMode visibilityMode;
   final HiddenLogoParser? parser;
-  final DeviceInfoPlugin? deviceInfoPlugin;
   final bool isIOS;
 
   @override
@@ -53,13 +44,12 @@ class _EmptyAppWithHiddenLogoState extends State<EmptyAppWithHiddenLogo> {
       home: const Scaffold(),
       builder: (context, child) {
         return HiddenLogoBase(
-          deviceInfoPlugin: widget.deviceInfoPlugin ?? DeviceInfoPlugin(),
-          parser: widget.parser ?? MockHiddenLogoParser(),
+          parser: widget.parser ?? HiddenLogoParser(),
           isVisible: widget.isVisible,
           visibilityMode: widget.visibilityMode,
           notchBuilder: (_, __) => SizedBox.shrink(key: widget.notchKey),
-          dynamicIslandBuilder: (_, __) =>
-              SizedBox.shrink(key: widget.dynamicIslandKey),
+          dynamicIslandBuilder:
+              (_, __) => SizedBox.shrink(key: widget.dynamicIslandKey),
           body: child!,
         );
       },
@@ -74,398 +64,408 @@ class _EmptyAppWithHiddenLogoState extends State<EmptyAppWithHiddenLogo> {
 }
 
 void main() {
-  final mockBaseDeviceInfo = MockBaseDeviceInfo();
-  final mockDeviceInfoPlugin = MockDeviceInfoPlugin();
+  setUp(() {
+    // Reset DeviceInfoService before each test
+    DeviceInfoService.reset();
+  });
 
-  when(() => mockDeviceInfoPlugin.deviceInfo)
-      .thenAnswer((_) async => mockBaseDeviceInfo);
+  tearDown(() {
+    DeviceInfoService.reset();
+    debugDefaultTargetPlatformOverride = null;
+  });
 
   Future<void> setOrientation(Orientation orientation) async =>
       await TestWidgetsFlutterBinding.ensureInitialized().setSurfaceSize(
-          orientation == Orientation.landscape
-              ? const Size(800, 600)
-              : const Size(600, 800));
+        orientation == Orientation.landscape
+            ? const Size(800, 600)
+            : const Size(600, 800),
+      );
 
-  Map<String, dynamic> buildRandomMockDeviceInfoDataMap({LogoType? logoType}) =>
-      TestUtils.buildMockDeviceInfoDataMap(TestUtils.iPhoneToCode(
-          TestUtils.getRandomIPhone(logoType: logoType),
-          withPrefix: true));
+  String getRandomMachineIdentifier({LogoType? logoType}) =>
+      TestUtils.getMachineIdentifier(
+        TestUtils.getRandomIPhone(logoType: logoType),
+      );
 
   group('HiddenLogo visibility', () {
     testWidgets(
-        'Notch logo should be displayed with default visibility parameters for '
-        'iPhones with notch logo type', (tester) async {
-      await setOrientation(Orientation.portrait);
-      const notchKey = ValueKey('notch');
-      when(() => mockBaseDeviceInfo.data).thenReturn(
-          buildRandomMockDeviceInfoDataMap(logoType: LogoType.notch));
-      final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-      await tester.pumpWidget(EmptyAppWithHiddenLogo(
-        deviceInfoPlugin: mockDeviceInfoPlugin,
-        parser: parser,
-        notchKey: notchKey,
-      ));
-      await tester.pumpAndSettle();
-      expect(find.byKey(notchKey), findsOneWidget);
-    });
+      'Notch logo should be displayed with default visibility parameters for '
+      'iPhones with notch logo type',
+      (tester) async {
+        await setOrientation(Orientation.portrait);
+        const notchKey = ValueKey('notch');
+        DeviceInfoService.setMockMachineIdentifier(
+          getRandomMachineIdentifier(logoType: LogoType.notch),
+        );
+        await tester.pumpWidget(
+          const EmptyAppWithHiddenLogo(notchKey: notchKey),
+        );
+        await tester.pumpAndSettle();
+        expect(find.byKey(notchKey), findsOneWidget);
+      },
+    );
 
-    testWidgets('Notch logo should not be displayed if isVisible is false',
-        (tester) async {
+    testWidgets('Notch logo should not be displayed if isVisible is false', (
+      tester,
+    ) async {
       await setOrientation(Orientation.portrait);
       const notchKey = ValueKey('notch');
-      when(() => mockBaseDeviceInfo.data).thenReturn(
-          buildRandomMockDeviceInfoDataMap(logoType: LogoType.notch));
-      final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-      await tester.pumpWidget(EmptyAppWithHiddenLogo(
-        deviceInfoPlugin: mockDeviceInfoPlugin,
-        parser: parser,
-        notchKey: notchKey,
-        isVisible: false,
-      ));
+      DeviceInfoService.setMockMachineIdentifier(
+        getRandomMachineIdentifier(logoType: LogoType.notch),
+      );
+      await tester.pumpWidget(
+        const EmptyAppWithHiddenLogo(notchKey: notchKey, isVisible: false),
+      );
       await tester.pumpAndSettle();
       expect(find.byKey(notchKey), findsNothing);
     });
 
     testWidgets(
-        'Notch should not be displayed while in foreground if visibilityMode '
-        'is background only', (tester) async {
-      await setOrientation(Orientation.portrait);
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
-      const notchKey = ValueKey('notch');
-      when(() => mockBaseDeviceInfo.data).thenReturn(
-          buildRandomMockDeviceInfoDataMap(logoType: LogoType.notch));
-      final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-      await tester.pumpWidget(EmptyAppWithHiddenLogo(
-        deviceInfoPlugin: mockDeviceInfoPlugin,
-        parser: parser,
-        notchKey: notchKey,
-        visibilityMode: LogoVisibilityMode.onlyInBackground,
-      ));
-      await tester.pumpAndSettle();
-      expect(find.byKey(notchKey), findsNothing);
-    });
+      'Notch should not be displayed while in foreground if visibilityMode '
+      'is background only',
+      (tester) async {
+        await setOrientation(Orientation.portrait);
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        );
+        const notchKey = ValueKey('notch');
+        DeviceInfoService.setMockMachineIdentifier(
+          getRandomMachineIdentifier(logoType: LogoType.notch),
+        );
+        await tester.pumpWidget(
+          const EmptyAppWithHiddenLogo(
+            notchKey: notchKey,
+            visibilityMode: LogoVisibilityMode.onlyInBackground,
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(find.byKey(notchKey), findsNothing);
+      },
+    );
 
     testWidgets(
-        'Notch should be displayed while in background if visibilityMode is '
-        'background only', (tester) async {
-      await setOrientation(Orientation.portrait);
-      const notchKey = ValueKey('notch');
-      when(() => mockBaseDeviceInfo.data).thenReturn(
-          buildRandomMockDeviceInfoDataMap(logoType: LogoType.notch));
-      final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-      await tester.pumpWidget(EmptyAppWithHiddenLogo(
-        deviceInfoPlugin: mockDeviceInfoPlugin,
-        parser: parser,
-        notchKey: notchKey,
-        visibilityMode: LogoVisibilityMode.onlyInBackground,
-      ));
-      await tester.pumpAndSettle();
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
-      await tester.pumpAndSettle();
-      expect(find.byKey(notchKey), findsOneWidget);
-    });
+      'Notch should be displayed while in background if visibilityMode is '
+      'background only',
+      (tester) async {
+        await setOrientation(Orientation.portrait);
+        const notchKey = ValueKey('notch');
+        DeviceInfoService.setMockMachineIdentifier(
+          getRandomMachineIdentifier(logoType: LogoType.notch),
+        );
+        await tester.pumpWidget(
+          const EmptyAppWithHiddenLogo(
+            notchKey: notchKey,
+            visibilityMode: LogoVisibilityMode.onlyInBackground,
+          ),
+        );
+        await tester.pumpAndSettle();
+        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+        await tester.pumpAndSettle();
+        expect(find.byKey(notchKey), findsOneWidget);
+      },
+    );
 
     testWidgets(
-        'Notch should disappear if app goes foreground if visibilityMode is '
-            'background only', (tester) async {
+      'Notch should disappear if app goes foreground if visibilityMode is '
+      'background only',
+      (tester) async {
+        await setOrientation(Orientation.portrait);
+        const notchKey = ValueKey('notch');
+        DeviceInfoService.setMockMachineIdentifier(
+          getRandomMachineIdentifier(logoType: LogoType.notch),
+        );
+        await tester.pumpWidget(
+          const EmptyAppWithHiddenLogo(
+            notchKey: notchKey,
+            visibilityMode: LogoVisibilityMode.onlyInBackground,
+          ),
+        );
+        await tester.pumpAndSettle();
+        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+        await tester.pumpAndSettle();
+        expect(find.byKey(notchKey), findsOneWidget);
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        );
+        await tester.pumpAndSettle();
+        expect(find.byKey(notchKey), findsNothing);
+      },
+    );
+
+    testWidgets('Notch should not be displayed for non target devices', (
+      tester,
+    ) async {
       await setOrientation(Orientation.portrait);
       const notchKey = ValueKey('notch');
-      when(() => mockBaseDeviceInfo.data).thenReturn(
-          buildRandomMockDeviceInfoDataMap(logoType: LogoType.notch));
-      final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-      await tester.pumpWidget(EmptyAppWithHiddenLogo(
-        deviceInfoPlugin: mockDeviceInfoPlugin,
-        parser: parser,
-        notchKey: notchKey,
-        visibilityMode: LogoVisibilityMode.onlyInBackground,
-      ));
-      await tester.pumpAndSettle();
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
-      await tester.pumpAndSettle();
-      expect(find.byKey(notchKey), findsOneWidget);
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      // Null simulates non target device
+      DeviceInfoService.setMockMachineIdentifier(null);
+      await tester.pumpWidget(const EmptyAppWithHiddenLogo(notchKey: notchKey));
       await tester.pumpAndSettle();
       expect(find.byKey(notchKey), findsNothing);
     });
 
-    testWidgets('Notch should not be displayed for non target devices',
-        (tester) async {
-      await setOrientation(Orientation.portrait);
-      const notchKey = ValueKey('notch');
-      // Empty map simulates non target device
-      when(() => mockBaseDeviceInfo.data).thenReturn({});
-      final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-      await tester.pumpWidget(EmptyAppWithHiddenLogo(
-        deviceInfoPlugin: mockDeviceInfoPlugin,
-        parser: parser,
-        notchKey: notchKey,
-      ));
-      await tester.pumpAndSettle();
-      expect(find.byKey(notchKey), findsNothing);
-    });
-
-    testWidgets('Notch logo should not be displayed in landscape orientation',
-        (tester) async {
+    testWidgets('Notch logo should not be displayed in landscape orientation', (
+      tester,
+    ) async {
       await setOrientation(Orientation.landscape);
       const notchKey = ValueKey('notch');
-      when(() => mockBaseDeviceInfo.data).thenReturn(
-          buildRandomMockDeviceInfoDataMap(logoType: LogoType.notch));
-      final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-      await tester.pumpWidget(EmptyAppWithHiddenLogo(
-        deviceInfoPlugin: mockDeviceInfoPlugin,
-        parser: parser,
-        notchKey: notchKey,
-      ));
+      DeviceInfoService.setMockMachineIdentifier(
+        getRandomMachineIdentifier(logoType: LogoType.notch),
+      );
+      await tester.pumpWidget(const EmptyAppWithHiddenLogo(notchKey: notchKey));
       await tester.pumpAndSettle();
       expect(find.byKey(notchKey), findsNothing);
     });
   });
 
   testWidgets(
-      'Notch logo should not be displayed after device rotates from portrait to landscape',
-      (tester) async {
-    await setOrientation(Orientation.portrait);
-    const notchKey = ValueKey('notch');
-    when(() => mockBaseDeviceInfo.data)
-        .thenReturn(buildRandomMockDeviceInfoDataMap(logoType: LogoType.notch));
-    final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-    await tester.pumpWidget(EmptyAppWithHiddenLogo(
-      deviceInfoPlugin: mockDeviceInfoPlugin,
-      parser: parser,
-      notchKey: notchKey,
-    ));
-    await tester.pumpAndSettle();
-    expect(find.byKey(notchKey), findsOneWidget);
-    await setOrientation(Orientation.landscape);
-    await tester.pumpAndSettle();
-    expect(find.byKey(notchKey), findsNothing);
-  });
+    'Notch logo should not be displayed after device rotates from portrait to landscape',
+    (tester) async {
+      await setOrientation(Orientation.portrait);
+      const notchKey = ValueKey('notch');
+      DeviceInfoService.setMockMachineIdentifier(
+        getRandomMachineIdentifier(logoType: LogoType.notch),
+      );
+      await tester.pumpWidget(const EmptyAppWithHiddenLogo(notchKey: notchKey));
+      await tester.pumpAndSettle();
+      expect(find.byKey(notchKey), findsOneWidget);
+      await setOrientation(Orientation.landscape);
+      await tester.pumpAndSettle();
+      expect(find.byKey(notchKey), findsNothing);
+    },
+  );
 
   testWidgets(
-      'Notch logo should be displayed after device rotates from landscape to portrait',
-      (tester) async {
-    await setOrientation(Orientation.landscape);
-    const notchKey = ValueKey('notch');
-    when(() => mockBaseDeviceInfo.data)
-        .thenReturn(buildRandomMockDeviceInfoDataMap(logoType: LogoType.notch));
-    final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-    await tester.pumpWidget(EmptyAppWithHiddenLogo(
-      deviceInfoPlugin: mockDeviceInfoPlugin,
-      parser: parser,
-      notchKey: notchKey,
-    ));
-    await tester.pumpAndSettle();
-    expect(find.byKey(notchKey), findsNothing);
-    await setOrientation(Orientation.portrait);
-    await tester.pumpAndSettle();
-    expect(find.byKey(notchKey), findsOneWidget);
-  });
+    'Notch logo should be displayed after device rotates from landscape to portrait',
+    (tester) async {
+      await setOrientation(Orientation.landscape);
+      const notchKey = ValueKey('notch');
+      DeviceInfoService.setMockMachineIdentifier(
+        getRandomMachineIdentifier(logoType: LogoType.notch),
+      );
+      await tester.pumpWidget(const EmptyAppWithHiddenLogo(notchKey: notchKey));
+      await tester.pumpAndSettle();
+      expect(find.byKey(notchKey), findsNothing);
+      await setOrientation(Orientation.portrait);
+      await tester.pumpAndSettle();
+      expect(find.byKey(notchKey), findsOneWidget);
+    },
+  );
 
   group('Dynamic Island Logo visibility', () {
     testWidgets(
-        'Dynamic Island logo should be displayed with default visibility parameters for '
-        'iPhones with Dynamic Island logo type', (tester) async {
-      await setOrientation(Orientation.portrait);
-      const dynamicIslandKey = ValueKey('dynamic_island');
-      when(() => mockBaseDeviceInfo.data).thenReturn(
-          buildRandomMockDeviceInfoDataMap(logoType: LogoType.dynamicIsland));
-      final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-      await tester.pumpWidget(EmptyAppWithHiddenLogo(
-        deviceInfoPlugin: mockDeviceInfoPlugin,
-        parser: parser,
-        dynamicIslandKey: dynamicIslandKey,
-      ));
-      await tester.pumpAndSettle();
-      expect(find.byKey(dynamicIslandKey), findsOneWidget);
-    });
-
-    testWidgets('Dynamic Island logo should not be displayed if isVisible is false',
-        (tester) async {
-      await setOrientation(Orientation.portrait);
-      const dynamicIslandKey = ValueKey('dynamic_island');
-      when(() => mockBaseDeviceInfo.data).thenReturn(
-          buildRandomMockDeviceInfoDataMap(logoType: LogoType.dynamicIsland));
-      final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-      await tester.pumpWidget(EmptyAppWithHiddenLogo(
-        deviceInfoPlugin: mockDeviceInfoPlugin,
-        parser: parser,
-        dynamicIslandKey: dynamicIslandKey,
-        isVisible: false,
-      ));
-      await tester.pumpAndSettle();
-      expect(find.byKey(dynamicIslandKey), findsNothing);
-    });
+      'Dynamic Island logo should be displayed with default visibility parameters for '
+      'iPhones with Dynamic Island logo type',
+      (tester) async {
+        await setOrientation(Orientation.portrait);
+        const dynamicIslandKey = ValueKey('dynamic_island');
+        DeviceInfoService.setMockMachineIdentifier(
+          getRandomMachineIdentifier(logoType: LogoType.dynamicIsland),
+        );
+        await tester.pumpWidget(
+          const EmptyAppWithHiddenLogo(dynamicIslandKey: dynamicIslandKey),
+        );
+        await tester.pumpAndSettle();
+        expect(find.byKey(dynamicIslandKey), findsOneWidget);
+      },
+    );
 
     testWidgets(
-        'Dynamic Island should not be displayed while in foreground if visibilityMode '
-        'is background only', (tester) async {
-      await setOrientation(Orientation.portrait);
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
-      const dynamicIslandKey = ValueKey('dynamic_island');
-      when(() => mockBaseDeviceInfo.data).thenReturn(
-          buildRandomMockDeviceInfoDataMap(logoType: LogoType.dynamicIsland));
-      final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-      await tester.pumpWidget(EmptyAppWithHiddenLogo(
-        deviceInfoPlugin: mockDeviceInfoPlugin,
-        parser: parser,
-        dynamicIslandKey: dynamicIslandKey,
-        visibilityMode: LogoVisibilityMode.onlyInBackground,
-      ));
-      await tester.pumpAndSettle();
-      expect(find.byKey(dynamicIslandKey), findsNothing);
-    });
+      'Dynamic Island logo should not be displayed if isVisible is false',
+      (tester) async {
+        await setOrientation(Orientation.portrait);
+        const dynamicIslandKey = ValueKey('dynamic_island');
+        DeviceInfoService.setMockMachineIdentifier(
+          getRandomMachineIdentifier(logoType: LogoType.dynamicIsland),
+        );
+        await tester.pumpWidget(
+          const EmptyAppWithHiddenLogo(
+            dynamicIslandKey: dynamicIslandKey,
+            isVisible: false,
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(find.byKey(dynamicIslandKey), findsNothing);
+      },
+    );
 
     testWidgets(
-        'Dynamic Island should be displayed while in background if visibilityMode is '
-        'background only', (tester) async {
-      await setOrientation(Orientation.portrait);
-      const dynamicIslandKey = ValueKey('dynamic_island');
-      when(() => mockBaseDeviceInfo.data).thenReturn(
-          buildRandomMockDeviceInfoDataMap(logoType: LogoType.dynamicIsland));
-      final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-      await tester.pumpWidget(EmptyAppWithHiddenLogo(
-        deviceInfoPlugin: mockDeviceInfoPlugin,
-        parser: parser,
-        dynamicIslandKey: dynamicIslandKey,
-        visibilityMode: LogoVisibilityMode.onlyInBackground,
-      ));
-      await tester.pumpAndSettle();
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
-      await tester.pumpAndSettle();
-      expect(find.byKey(dynamicIslandKey), findsOneWidget);
-    });
+      'Dynamic Island should not be displayed while in foreground if visibilityMode '
+      'is background only',
+      (tester) async {
+        await setOrientation(Orientation.portrait);
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        );
+        const dynamicIslandKey = ValueKey('dynamic_island');
+        DeviceInfoService.setMockMachineIdentifier(
+          getRandomMachineIdentifier(logoType: LogoType.dynamicIsland),
+        );
+        await tester.pumpWidget(
+          const EmptyAppWithHiddenLogo(
+            dynamicIslandKey: dynamicIslandKey,
+            visibilityMode: LogoVisibilityMode.onlyInBackground,
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(find.byKey(dynamicIslandKey), findsNothing);
+      },
+    );
 
     testWidgets(
-        'Dynamic Island should disappear if app goes foreground if visibilityMode is '
-            'background only', (tester) async {
+      'Dynamic Island should be displayed while in background if visibilityMode is '
+      'background only',
+      (tester) async {
+        await setOrientation(Orientation.portrait);
+        const dynamicIslandKey = ValueKey('dynamic_island');
+        DeviceInfoService.setMockMachineIdentifier(
+          getRandomMachineIdentifier(logoType: LogoType.dynamicIsland),
+        );
+        await tester.pumpWidget(
+          const EmptyAppWithHiddenLogo(
+            dynamicIslandKey: dynamicIslandKey,
+            visibilityMode: LogoVisibilityMode.onlyInBackground,
+          ),
+        );
+        await tester.pumpAndSettle();
+        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+        await tester.pumpAndSettle();
+        expect(find.byKey(dynamicIslandKey), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Dynamic Island should disappear if app goes foreground if visibilityMode is '
+      'background only',
+      (tester) async {
+        await setOrientation(Orientation.portrait);
+        const dynamicIslandKey = ValueKey('dynamic_island');
+        DeviceInfoService.setMockMachineIdentifier(
+          getRandomMachineIdentifier(logoType: LogoType.dynamicIsland),
+        );
+        await tester.pumpWidget(
+          const EmptyAppWithHiddenLogo(
+            dynamicIslandKey: dynamicIslandKey,
+            visibilityMode: LogoVisibilityMode.onlyInBackground,
+          ),
+        );
+        await tester.pumpAndSettle();
+        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+        await tester.pumpAndSettle();
+        expect(find.byKey(dynamicIslandKey), findsOneWidget);
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        );
+        await tester.pumpAndSettle();
+        expect(find.byKey(dynamicIslandKey), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'Dynamic Island should not be displayed for non target devices',
+      (tester) async {
+        await setOrientation(Orientation.portrait);
+        const dynamicIslandKey = ValueKey('dynamic_island');
+        // Null simulates non target device
+        DeviceInfoService.setMockMachineIdentifier(null);
+        await tester.pumpWidget(
+          const EmptyAppWithHiddenLogo(dynamicIslandKey: dynamicIslandKey),
+        );
+        await tester.pumpAndSettle();
+        expect(find.byKey(dynamicIslandKey), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'Dynamic Island logo should not be displayed in landscape orientation',
+      (tester) async {
+        await setOrientation(Orientation.landscape);
+        const dynamicIslandKey = ValueKey('dynamic_island');
+        DeviceInfoService.setMockMachineIdentifier(
+          getRandomMachineIdentifier(logoType: LogoType.dynamicIsland),
+        );
+        await tester.pumpWidget(
+          const EmptyAppWithHiddenLogo(dynamicIslandKey: dynamicIslandKey),
+        );
+        await tester.pumpAndSettle();
+        expect(find.byKey(dynamicIslandKey), findsNothing);
+      },
+    );
+  });
+
+  testWidgets(
+    'Dynamic Island logo should not be displayed after device rotates from portrait to landscape',
+    (tester) async {
       await setOrientation(Orientation.portrait);
       const dynamicIslandKey = ValueKey('dynamic_island');
-      when(() => mockBaseDeviceInfo.data).thenReturn(
-          buildRandomMockDeviceInfoDataMap(logoType: LogoType.dynamicIsland));
-      final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-      await tester.pumpWidget(EmptyAppWithHiddenLogo(
-        deviceInfoPlugin: mockDeviceInfoPlugin,
-        parser: parser,
-        dynamicIslandKey: dynamicIslandKey,
-        visibilityMode: LogoVisibilityMode.onlyInBackground,
-      ));
-      await tester.pumpAndSettle();
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      DeviceInfoService.setMockMachineIdentifier(
+        getRandomMachineIdentifier(logoType: LogoType.dynamicIsland),
+      );
+      await tester.pumpWidget(
+        const EmptyAppWithHiddenLogo(dynamicIslandKey: dynamicIslandKey),
+      );
       await tester.pumpAndSettle();
       expect(find.byKey(dynamicIslandKey), findsOneWidget);
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await setOrientation(Orientation.landscape);
       await tester.pumpAndSettle();
       expect(find.byKey(dynamicIslandKey), findsNothing);
-    });
+    },
+  );
 
-    testWidgets('Dynamic Island should not be displayed for non target devices',
-        (tester) async {
-      await setOrientation(Orientation.portrait);
-      const dynamicIslandKey = ValueKey('dynamic_island');
-      // Empty map simulates non target device
-      when(() => mockBaseDeviceInfo.data).thenReturn({});
-      final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-      await tester.pumpWidget(EmptyAppWithHiddenLogo(
-        deviceInfoPlugin: mockDeviceInfoPlugin,
-        parser: parser,
-        dynamicIslandKey: dynamicIslandKey,
-      ));
-      await tester.pumpAndSettle();
-      expect(find.byKey(dynamicIslandKey), findsNothing);
-    });
-
-    testWidgets('Dynamic Island logo should not be displayed in landscape orientation',
-        (tester) async {
+  testWidgets(
+    'Dynamic Island logo should be displayed after device rotates from landscape to portrait',
+    (tester) async {
       await setOrientation(Orientation.landscape);
       const dynamicIslandKey = ValueKey('dynamic_island');
-      when(() => mockBaseDeviceInfo.data).thenReturn(
-          buildRandomMockDeviceInfoDataMap(logoType: LogoType.dynamicIsland));
-      final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-      await tester.pumpWidget(EmptyAppWithHiddenLogo(
-        deviceInfoPlugin: mockDeviceInfoPlugin,
-        parser: parser,
-        dynamicIslandKey: dynamicIslandKey,
-      ));
+      DeviceInfoService.setMockMachineIdentifier(
+        getRandomMachineIdentifier(logoType: LogoType.dynamicIsland),
+      );
+      await tester.pumpWidget(
+        const EmptyAppWithHiddenLogo(dynamicIslandKey: dynamicIslandKey),
+      );
       await tester.pumpAndSettle();
       expect(find.byKey(dynamicIslandKey), findsNothing);
-    });
-  });
-
-  testWidgets(
-      'Dynamic Island logo should not be displayed after device rotates from portrait to landscape',
-      (tester) async {
-    await setOrientation(Orientation.portrait);
-    const dynamicIslandKey = ValueKey('dynamic_island');
-    when(() => mockBaseDeviceInfo.data)
-        .thenReturn(buildRandomMockDeviceInfoDataMap(logoType: LogoType.dynamicIsland));
-    final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-    await tester.pumpWidget(EmptyAppWithHiddenLogo(
-      deviceInfoPlugin: mockDeviceInfoPlugin,
-      parser: parser,
-      dynamicIslandKey: dynamicIslandKey,
-    ));
-    await tester.pumpAndSettle();
-    expect(find.byKey(dynamicIslandKey), findsOneWidget);
-    await setOrientation(Orientation.landscape);
-    await tester.pumpAndSettle();
-    expect(find.byKey(dynamicIslandKey), findsNothing);
-  });
-
-  testWidgets(
-      'Dynamic Island logo should be displayed after device rotates from landscape to portrait',
-      (tester) async {
-    await setOrientation(Orientation.landscape);
-    const dynamicIslandKey = ValueKey('dynamic_island');
-    when(() => mockBaseDeviceInfo.data)
-        .thenReturn(buildRandomMockDeviceInfoDataMap(logoType: LogoType.dynamicIsland));
-    final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-    await tester.pumpWidget(EmptyAppWithHiddenLogo(
-      deviceInfoPlugin: mockDeviceInfoPlugin,
-      parser: parser,
-      dynamicIslandKey: dynamicIslandKey,
-    ));
-    await tester.pumpAndSettle();
-    expect(find.byKey(dynamicIslandKey), findsNothing);
-    await setOrientation(Orientation.portrait);
-    await tester.pumpAndSettle();
-    expect(find.byKey(dynamicIslandKey), findsOneWidget);
-  });
+      await setOrientation(Orientation.portrait);
+      await tester.pumpAndSettle();
+      expect(find.byKey(dynamicIslandKey), findsOneWidget);
+    },
+  );
 
   group('Mixed logo type behavior', () {
-    testWidgets('Should display only Dynamic Island logo for Dynamic Island devices',
-        (tester) async {
+    testWidgets(
+      'Should display only Dynamic Island logo for Dynamic Island devices',
+      (tester) async {
+        await setOrientation(Orientation.portrait);
+        const notchKey = ValueKey('notch');
+        const dynamicIslandKey = ValueKey('dynamic_island');
+        DeviceInfoService.setMockMachineIdentifier(
+          'iPhone15,2',
+        ); // iPhone 14 Pro
+        await tester.pumpWidget(
+          const EmptyAppWithHiddenLogo(
+            notchKey: notchKey,
+            dynamicIslandKey: dynamicIslandKey,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(dynamicIslandKey), findsOneWidget);
+        expect(find.byKey(notchKey), findsNothing);
+      },
+    );
+
+    testWidgets('Should display only notch logo for notch devices', (
+      tester,
+    ) async {
       await setOrientation(Orientation.portrait);
       const notchKey = ValueKey('notch');
       const dynamicIslandKey = ValueKey('dynamic_island');
-      when(() => mockBaseDeviceInfo.data).thenReturn(
-          TestUtils.buildMockDeviceInfoDataMap('iPhone15,2')); // iPhone 14 Pro
-      final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-      await tester.pumpWidget(EmptyAppWithHiddenLogo(
-        deviceInfoPlugin: mockDeviceInfoPlugin,
-        parser: parser,
-        notchKey: notchKey,
-        dynamicIslandKey: dynamicIslandKey,
-      ));
-      await tester.pumpAndSettle();
-
-      expect(find.byKey(dynamicIslandKey), findsOneWidget);
-      expect(find.byKey(notchKey), findsNothing);
-    });
-
-    testWidgets('Should display only notch logo for notch devices',
-        (tester) async {
-      await setOrientation(Orientation.portrait);
-      const notchKey = ValueKey('notch');
-      const dynamicIslandKey = ValueKey('dynamic_island');
-      when(() => mockBaseDeviceInfo.data).thenReturn(
-          TestUtils.buildMockDeviceInfoDataMap('iPhone10,6')); // iPhone X
-      final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-      await tester.pumpWidget(EmptyAppWithHiddenLogo(
-        deviceInfoPlugin: mockDeviceInfoPlugin,
-        parser: parser,
-        notchKey: notchKey,
-        dynamicIslandKey: dynamicIslandKey,
-      ));
+      DeviceInfoService.setMockMachineIdentifier('iPhone10,6'); // iPhone X
+      await tester.pumpWidget(
+        const EmptyAppWithHiddenLogo(
+          notchKey: notchKey,
+          dynamicIslandKey: dynamicIslandKey,
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byKey(notchKey), findsOneWidget);
@@ -474,41 +474,48 @@ void main() {
   });
 
   group('Dynamic Island specific features', () {
-    testWidgets('Dynamic Island logo should respect top margin positioning',
-        (tester) async {
+    testWidgets('Dynamic Island logo should respect top margin positioning', (
+      tester,
+    ) async {
       await setOrientation(Orientation.portrait);
-      when(() => mockBaseDeviceInfo.data).thenReturn(
-          TestUtils.buildMockDeviceInfoDataMap('iPhone15,2')); // iPhone 14 Pro
-      final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-      await tester.pumpWidget(EmptyAppWithHiddenLogo(
-        deviceInfoPlugin: mockDeviceInfoPlugin,
-        parser: parser,
-        dynamicIslandKey: const ValueKey('dynamic_island'),
-      ));
+      DeviceInfoService.setMockMachineIdentifier('iPhone15,2'); // iPhone 14 Pro
+      final parser = HiddenLogoParser(machineIdentifier: 'iPhone15,2');
+      await tester.pumpWidget(
+        EmptyAppWithHiddenLogo(
+          parser: parser,
+          dynamicIslandKey: const ValueKey('dynamic_island'),
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Verify positioning with expected top margin (11.3 for iPhone 14 Pro)
       expect(parser.dynamicIslandTopMargin, equals(11.3));
     });
 
-    testWidgets('Dynamic Island constraints should be smaller than notch',
-        (tester) async {
+    testWidgets('Dynamic Island constraints should be smaller than notch', (
+      tester,
+    ) async {
       // Test Dynamic Island device
-      when(() => mockBaseDeviceInfo.data).thenReturn(
-          TestUtils.buildMockDeviceInfoDataMap('iPhone15,2')); // iPhone 14 Pro
-      final dynamicIslandParser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
+      final dynamicIslandParser = HiddenLogoParser(
+        machineIdentifier: 'iPhone15,2',
+      ); // iPhone 14 Pro
       final dynamicIslandConstraints = dynamicIslandParser.logoConstraints;
 
-      // Test notch device - create new mock for different device
-      final mockNotchDeviceInfo = MockBaseDeviceInfo();
-      when(() => mockNotchDeviceInfo.data).thenReturn(
-          TestUtils.buildMockDeviceInfoDataMap('iPhone10,6')); // iPhone X
-      final notchParser = HiddenLogoParser(deviceInfo: mockNotchDeviceInfo);
+      // Test notch device
+      final notchParser = HiddenLogoParser(
+        machineIdentifier: 'iPhone10,6',
+      ); // iPhone X
       final notchConstraints = notchParser.logoConstraints;
 
       // Dynamic Island should be smaller width than notch
-      expect(dynamicIslandConstraints.maxWidth, lessThan(notchConstraints.maxWidth));
-      expect(dynamicIslandConstraints.maxHeight, greaterThan(notchConstraints.maxHeight));
+      expect(
+        dynamicIslandConstraints.maxWidth,
+        lessThan(notchConstraints.maxWidth),
+      );
+      expect(
+        dynamicIslandConstraints.maxHeight,
+        greaterThan(notchConstraints.maxHeight),
+      );
     });
   });
 
@@ -531,17 +538,19 @@ void main() {
     };
 
     dynamicIslandDevices.forEach((deviceName, deviceCode) {
-      testWidgets('$deviceName should display Dynamic Island logo', (tester) async {
+      testWidgets('$deviceName should display Dynamic Island logo', (
+        tester,
+      ) async {
         await setOrientation(Orientation.portrait);
         const dynamicIslandKey = ValueKey('dynamic_island');
-        when(() => mockBaseDeviceInfo.data).thenReturn(
-            TestUtils.buildMockDeviceInfoDataMap(deviceCode));
-        final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-        await tester.pumpWidget(EmptyAppWithHiddenLogo(
-          deviceInfoPlugin: mockDeviceInfoPlugin,
-          parser: parser,
-          dynamicIslandKey: dynamicIslandKey,
-        ));
+        DeviceInfoService.setMockMachineIdentifier(deviceCode);
+        final parser = HiddenLogoParser(machineIdentifier: deviceCode);
+        await tester.pumpWidget(
+          EmptyAppWithHiddenLogo(
+            parser: parser,
+            dynamicIslandKey: dynamicIslandKey,
+          ),
+        );
         await tester.pumpAndSettle();
         expect(find.byKey(dynamicIslandKey), findsOneWidget);
         expect(parser.iPhonesLogoType, equals(LogoType.dynamicIsland));

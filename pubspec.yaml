@@ -9,7 +9,6 @@ environment:
   sdk: '>=3.7.0 <4.0.0'
 
 dependencies:
-  device_info_plus: '>=12.1.0 <13.0.0'
   flutter:
     sdk: flutter
 
@@ -18,3 +17,17 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   mocktail: '>=1.0.4 <2.0.0'
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        dartPluginClass: HiddenLogoStub
+      ios:
+        pluginClass: HiddenLogoPlugin
+      linux:
+        dartPluginClass: HiddenLogoStub
+      macos:
+        dartPluginClass: HiddenLogoStub
+      windows:
+        dartPluginClass: HiddenLogoStub

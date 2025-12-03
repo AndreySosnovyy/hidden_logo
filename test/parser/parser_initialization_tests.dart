@@ -1,62 +1,75 @@
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hidden_logo/src/parser.dart';
-import 'package:mocktail/mocktail.dart';
-
-class MockBaseDeviceInfo extends Mock implements BaseDeviceInfo {}
 
 void main() {
-  group('_deviceInfo property initialization tests', () {
+  group('machineIdentifier property initialization tests', () {
     test(
-        'Parser should throw an error of StateError type if deviceInfo is not set but was called',
-        () {
-      final parser = HiddenLogoParser();
-      expect(() => parser.currentIPhone, throwsA(isA<StateError>()));
-    });
-
-    test('Parser should work if BaseDeviceInfo is provided via constructor',
-        () {
-      final mockBaseDeviceInfo = MockBaseDeviceInfo();
-      final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-      expect(parser.currentIPhone, anyOf([null, DeviceModel]));
-    });
-
-    test('Parser should work if BaseDeviceInfo is set via setter', () {
-      final mockBaseDeviceInfo = MockBaseDeviceInfo();
-      final parser = HiddenLogoParser();
-      parser.deviceInfo = mockBaseDeviceInfo;
-      expect(parser.currentIPhone, anyOf([null, DeviceModel]));
-    });
+      'Parser should throw StateError if machineIdentifier is not set but currentIPhone was called',
+      () {
+        final parser = HiddenLogoParser();
+        expect(() => parser.currentIPhone, throwsA(isA<StateError>()));
+      },
+    );
 
     test(
-        'Parser should throw an error of StateError type if deviceInfo is '
+      'Parser should work if machineIdentifier is provided via constructor',
+      () {
+        final parser = HiddenLogoParser(machineIdentifier: 'iPhone15,2');
+        expect(parser.currentIPhone, DeviceModel.iPhone14Pro);
+      },
+    );
+
+    test('Parser should work if machineIdentifier is set via setter', () {
+      final parser = HiddenLogoParser();
+      parser.machineIdentifier = 'iPhone15,2';
+      expect(parser.currentIPhone, DeviceModel.iPhone14Pro);
+    });
+
+    test('Parser should throw StateError if machineIdentifier is '
         'set via constructor and then set via setter', () {
-      final mockBaseDeviceInfo = MockBaseDeviceInfo();
-      final parser = HiddenLogoParser(deviceInfo: mockBaseDeviceInfo);
-      expect(() => parser.deviceInfo = mockBaseDeviceInfo,
-          throwsA(isA<StateError>()));
+      final parser = HiddenLogoParser(machineIdentifier: 'iPhone15,2');
+      expect(
+        () => parser.machineIdentifier = 'iPhone10,6',
+        throwsA(isA<StateError>()),
+      );
+    });
+
+    test('Parser should throw StateError if machineIdentifier is '
+        'set via setter 2 times', () {
+      final parser = HiddenLogoParser();
+      parser.machineIdentifier = 'iPhone15,2';
+      expect(
+        () => parser.machineIdentifier = 'iPhone10,6',
+        throwsA(isA<StateError>()),
+      );
+    });
+
+    test('isInitialized should return true when machineIdentifier is set', () {
+      final parser = HiddenLogoParser();
+      parser.machineIdentifier = 'iPhone15,2';
+      expect(parser.isInitialized, true);
     });
 
     test(
-        'Parser should throw an error of StateError type if deviceInfo is '
-        'set via setter 2 times', () {
-      final mockBaseDeviceInfo = MockBaseDeviceInfo();
-      final parser = HiddenLogoParser();
-      parser.deviceInfo = mockBaseDeviceInfo;
-      expect(() => parser.deviceInfo = mockBaseDeviceInfo,
-          throwsA(isA<StateError>()));
-    });
+      'isInitialized should return false when machineIdentifier is not set',
+      () {
+        final parser = HiddenLogoParser();
+        expect(parser.isInitialized, false);
+      },
+    );
 
-    test('isDeviceInfoSet should return true when deviceInfo is set', () {
-      final mockBaseDeviceInfo = MockBaseDeviceInfo();
-      final parser = HiddenLogoParser();
-      parser.deviceInfo = mockBaseDeviceInfo;
-      expect(parser.isDeviceInfoSet, true);
-    });
+    test(
+      'Parser should work with null machineIdentifier when using initialized factory',
+      () {
+        final parser = HiddenLogoParser.initialized(machineIdentifier: null);
+        expect(parser.currentIPhone, isNull);
+        expect(parser.isTargetIPhone, isFalse);
+      },
+    );
 
-    test('isDeviceInfoSet should return false when deviceInfo is not set', () {
-      final parser = HiddenLogoParser();
-      expect(parser.isDeviceInfoSet, false);
+    test('Parser with null in constructor should NOT be initialized', () {
+      final parser = HiddenLogoParser(machineIdentifier: null);
+      expect(parser.isInitialized, false);
     });
   });
 }

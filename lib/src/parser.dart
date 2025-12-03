@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
@@ -208,30 +207,49 @@ class HiddenLogoParser {
       return null;
     }
   }
+
   /// {@macro hidden_logo.HiddenLogoParser}
+  ///
+  /// If [machineIdentifier] is provided (including null), the parser is
+  /// immediately initialized. If not provided, use the [machineIdentifier]
+  /// setter to initialize before accessing device properties.
   HiddenLogoParser({
-    BaseDeviceInfo? deviceInfo,
+    String? machineIdentifier,
+    bool initializeWithValue = false,
   }) {
-    if (deviceInfo != null) {
-      _deviceInfo = deviceInfo;
-      _deviceInfoInitializationCompleter.complete();
+    // If machineIdentifier is explicitly provided OR initializeWithValue is true,
+    // mark as initialized
+    if (initializeWithValue || machineIdentifier != null) {
+      _machineIdentifier = machineIdentifier;
+      _initializationCompleter.complete();
     }
   }
 
-  /// Information about current device provided by DeviceInfoPlugin
-  late final BaseDeviceInfo _deviceInfo;
-  final _deviceInfoInitializationCompleter = Completer<void>();
+  /// Creates an initialized parser with the given machine identifier.
+  /// Use this factory when you have the identifier value (including null).
+  factory HiddenLogoParser.initialized({String? machineIdentifier}) {
+    return HiddenLogoParser(
+      machineIdentifier: machineIdentifier,
+      initializeWithValue: true,
+    );
+  }
 
-  /// Returns true if _deviceInfo property is initialized
-  bool get isDeviceInfoSet => _deviceInfoInitializationCompleter.isCompleted;
+  /// iOS machine identifier (e.g., "iPhone15,2")
+  String? _machineIdentifier;
+  final _initializationCompleter = Completer<void>();
 
-  set deviceInfo(BaseDeviceInfo value) {
-    if (_deviceInfoInitializationCompleter.isCompleted) {
+  /// Returns true if machine identifier is initialized
+  bool get isInitialized => _initializationCompleter.isCompleted;
+
+  /// Sets the machine identifier. Can only be called once.
+  set machineIdentifier(String? value) {
+    if (_initializationCompleter.isCompleted) {
       throw StateError(
-          'HiddenLogoParser\'s _deviceInfo property is already initialized, set it only once!');
+        'HiddenLogoParser is already initialized, set machineIdentifier only once!',
+      );
     }
-    _deviceInfo = value;
-    _deviceInfoInitializationCompleter.complete();
+    _machineIdentifier = value;
+    _initializationCompleter.complete();
   }
 
   /// Whether the current device is a supported iPhone model.
@@ -286,7 +304,7 @@ class HiddenLogoParser {
 
   /// The specific iPhone model of the current device.
   ///
-  /// Parses the device information to determine which iPhone model is currently
+  /// Parses the machine identifier to determine which iPhone model is currently
   /// running the app. Returns `null` for non-iPhone devices or unsupported models.
   ///
   /// The detection is based on the device's machine identifier (e.g., "iPhone10,6"
@@ -301,34 +319,28 @@ class HiddenLogoParser {
   /// }
   /// ```
   ///
-  /// **Note**: The device info must be initialized before calling this getter.
-  /// Use [isDeviceInfoSet] to check initialization status.
+  /// **Note**: The parser must be initialized before calling this getter.
+  /// Use [isInitialized] to check initialization status.
   DeviceModel? get currentIPhone {
-    if (!_deviceInfoInitializationCompleter.isCompleted) {
+    if (!_initializationCompleter.isCompleted) {
       throw StateError(
-          'HiddenLogoParser\'s _deviceInfo property is not initialized, set it first!');
+        'HiddenLogoParser is not initialized, set machineIdentifier first!',
+      );
     }
-    late final String deviceName;
-    late final String deviceCode;
+
+    final machineId = _machineIdentifier;
+    if (machineId == null || machineId.isEmpty) return null;
+    if (!machineId.startsWith('iPhone')) return null;
+
     try {
-      deviceName = _deviceInfo.data['utsname']['machine'];
-      if (!deviceName.startsWith('iPhone')) return null;
-      deviceCode = deviceName.substring('iPhone'.length);
-    } on TypeError catch (_) {
-      // Handles cases where data structure is unexpected (e.g., null values, wrong types)
-      return null;
-    } on NoSuchMethodError catch (_) {
-      // Handles cases where expected methods don't exist (e.g., data is not a Map)
-      return null;
+      final deviceCode = machineId.substring('iPhone'.length);
+      if (deviceCode.isEmpty) return null;
+      return _deviceCodeMap[deviceCode];
     } on RangeError catch (_) {
-      // Handles cases where substring operation fails due to invalid indices
       return null;
     } catch (_) {
-      // Fallback for any other unexpected exceptions
       return null;
     }
-    if (deviceName.isEmpty || deviceCode.isEmpty) return null;
-    return _deviceCodeMap[deviceCode];
   }
 
   /// Whether the current device supports logo placement.

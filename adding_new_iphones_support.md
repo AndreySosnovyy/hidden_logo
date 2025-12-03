@@ -5,7 +5,7 @@
 ## test
 
 1) **utils.dart**: add reverse code parsing, hardcode to lists
-2) **parser/parser_constraints_test.dart**: add constraints tests 
+2) **parser/parser_constraints_test.dart**: add constraints tests
 3) **parser/parser_device_test.dart**: add code and logo type tests
 
 ## README.md

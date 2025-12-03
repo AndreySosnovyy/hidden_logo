@@ -1,24 +1,16 @@
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hidden_logo/src/parser.dart';
-import 'package:mocktail/mocktail.dart';
-
-import '../utils.dart';
-
-class MockBaseDeviceInfo extends Mock implements BaseDeviceInfo {}
 
 void main() {
   group('Platform Detection Edge Cases', () {
     group('Non-iOS Platform Behavior', () {
-      testWidgets('Should not display logo on Android platform', (tester) async {
+      testWidgets('Should not display logo on Android platform', (
+        tester,
+      ) async {
         debugDefaultTargetPlatformOverride = TargetPlatform.android;
 
-        final mockDeviceInfo = MockBaseDeviceInfo();
-        when(() => mockDeviceInfo.data).thenReturn(
-            TestUtils.buildMockDeviceInfoDataMap('iPhone15,2'));
-        final parser = HiddenLogoParser(deviceInfo: mockDeviceInfo);
+        final parser = HiddenLogoParser(machineIdentifier: 'iPhone15,2');
 
         // Even with valid iPhone data, should not be target device on Android
         expect(parser.isTargetDevice, isFalse);
@@ -29,19 +21,19 @@ void main() {
       });
 
       testWidgets('Should not display logo on web platform', (tester) async {
-        debugDefaultTargetPlatformOverride = TargetPlatform.linux; // Simulate web
+        debugDefaultTargetPlatformOverride =
+            TargetPlatform.linux; // Simulate web
 
-        final mockDeviceInfo = MockBaseDeviceInfo();
-        when(() => mockDeviceInfo.data).thenReturn(
-            TestUtils.buildMockDeviceInfoDataMap('iPhone15,2'));
-        final parser = HiddenLogoParser(deviceInfo: mockDeviceInfo);
+        final parser = HiddenLogoParser(machineIdentifier: 'iPhone15,2');
 
         expect(parser.isTargetDevice, isFalse);
 
         debugDefaultTargetPlatformOverride = null;
       });
 
-      testWidgets('Should not display logo on desktop platforms', (tester) async {
+      testWidgets('Should not display logo on desktop platforms', (
+        tester,
+      ) async {
         final platforms = [
           TargetPlatform.windows,
           TargetPlatform.macOS,
@@ -51,13 +43,13 @@ void main() {
         for (final platform in platforms) {
           debugDefaultTargetPlatformOverride = platform;
 
-          final mockDeviceInfo = MockBaseDeviceInfo();
-          when(() => mockDeviceInfo.data).thenReturn(
-              TestUtils.buildMockDeviceInfoDataMap('iPhone15,2'));
-          final parser = HiddenLogoParser(deviceInfo: mockDeviceInfo);
+          final parser = HiddenLogoParser(machineIdentifier: 'iPhone15,2');
 
-          expect(parser.isTargetDevice, isFalse,
-              reason: 'Should not be target device on $platform');
+          expect(
+            parser.isTargetDevice,
+            isFalse,
+            reason: 'Should not be target device on $platform',
+          );
         }
 
         debugDefaultTargetPlatformOverride = null;
@@ -66,10 +58,7 @@ void main() {
       testWidgets('Should only work on iOS platform', (tester) async {
         debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
 
-        final mockDeviceInfo = MockBaseDeviceInfo();
-        when(() => mockDeviceInfo.data).thenReturn(
-            TestUtils.buildMockDeviceInfoDataMap('iPhone15,2'));
-        final parser = HiddenLogoParser(deviceInfo: mockDeviceInfo);
+        final parser = HiddenLogoParser(machineIdentifier: 'iPhone15,2');
 
         expect(parser.isTargetDevice, isTrue);
         expect(parser.isTargetIPhone, isTrue);
@@ -79,35 +68,22 @@ void main() {
     });
 
     group('iOS Simulator vs Real Device', () {
-      test('Should handle simulator device codes', () {
-        final mockDeviceInfo = MockBaseDeviceInfo();
-        // Simulator typically returns 'x86_64' or 'arm64' instead of iPhone codes
-        when(() => mockDeviceInfo.data).thenReturn({
-          'utsname': {'machine': 'x86_64'}
-        });
-        final parser = HiddenLogoParser(deviceInfo: mockDeviceInfo);
+      test('Should handle simulator device codes (x86_64)', () {
+        final parser = HiddenLogoParser(machineIdentifier: 'x86_64');
 
         expect(parser.currentIPhone, isNull);
         expect(parser.isTargetIPhone, isFalse);
       });
 
       test('Should handle arm64 simulator', () {
-        final mockDeviceInfo = MockBaseDeviceInfo();
-        when(() => mockDeviceInfo.data).thenReturn({
-          'utsname': {'machine': 'arm64'}
-        });
-        final parser = HiddenLogoParser(deviceInfo: mockDeviceInfo);
+        final parser = HiddenLogoParser(machineIdentifier: 'arm64');
 
         expect(parser.currentIPhone, isNull);
         expect(parser.isTargetIPhone, isFalse);
       });
 
       test('Should work with real device iPhone codes', () {
-        final mockDeviceInfo = MockBaseDeviceInfo();
-        when(() => mockDeviceInfo.data).thenReturn({
-          'utsname': {'machine': 'iPhone15,2'}
-        });
-        final parser = HiddenLogoParser(deviceInfo: mockDeviceInfo);
+        final parser = HiddenLogoParser(machineIdentifier: 'iPhone15,2');
 
         expect(parser.currentIPhone, isNotNull);
         expect(parser.isTargetIPhone, isTrue);
@@ -115,14 +91,10 @@ void main() {
     });
 
     group('Unknown Platform Handling', () {
-      test('Should handle null target platform gracefully', () {
-        // This tests the case where TargetPlatform might be extended in future
-        final mockDeviceInfo = MockBaseDeviceInfo();
-        when(() => mockDeviceInfo.data).thenReturn(
-            TestUtils.buildMockDeviceInfoDataMap('iPhone15,2'));
-        final parser = HiddenLogoParser(deviceInfo: mockDeviceInfo);
+      test('Should handle unknown machine identifier gracefully', () {
+        final parser = HiddenLogoParser(machineIdentifier: 'iPhone15,2');
 
-        // Should still parse iPhone correctly regardless of platform detection issues
+        // Should still parse iPhone correctly regardless of platform
         expect(parser.currentIPhone, isNotNull);
         expect(parser.isTargetIPhone, isTrue);
       });
@@ -133,10 +105,7 @@ void main() {
         // Start with non-iOS
         debugDefaultTargetPlatformOverride = TargetPlatform.android;
 
-        final mockDeviceInfo = MockBaseDeviceInfo();
-        when(() => mockDeviceInfo.data).thenReturn(
-            TestUtils.buildMockDeviceInfoDataMap('iPhone15,2'));
-        final parser = HiddenLogoParser(deviceInfo: mockDeviceInfo);
+        final parser = HiddenLogoParser(machineIdentifier: 'iPhone15,2');
 
         expect(parser.isTargetDevice, isFalse);
 

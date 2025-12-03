@@ -1,25 +1,11 @@
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hidden_logo/src/parser.dart';
-import 'package:mocktail/mocktail.dart';
-
-import '../utils.dart';
-
-class MockBaseDeviceInfo extends Mock implements BaseDeviceInfo {}
 
 void main() {
   group('Error State Handling Tests', () {
-    late MockBaseDeviceInfo mockDeviceInfo;
-    late HiddenLogoParser parser;
-
-    setUp(() {
-      mockDeviceInfo = MockBaseDeviceInfo();
-      parser = HiddenLogoParser(deviceInfo: mockDeviceInfo);
-    });
-
-    group('Device Info Parsing Errors', () {
-      test('Should handle TypeError when data is null', () {
-        when(() => mockDeviceInfo.data).thenThrow(TypeError());
+    group('Machine Identifier Parsing Errors', () {
+      test('Should handle null machine identifier', () {
+        final parser = HiddenLogoParser.initialized(machineIdentifier: null);
 
         expect(parser.currentIPhone, isNull);
         expect(parser.isTargetIPhone, isFalse);
@@ -27,82 +13,15 @@ void main() {
         expect(parser.logoConstraints.maxWidth, equals(0));
       });
 
-      test('Should handle NoSuchMethodError when data structure is unexpected', () {
-        when(() => mockDeviceInfo.data).thenThrow(NoSuchMethodError.withInvocation(
-          null, Invocation.getter(#data)));
+      test('Should handle empty machine identifier', () {
+        final parser = HiddenLogoParser(machineIdentifier: '');
 
         expect(parser.currentIPhone, isNull);
         expect(parser.isTargetIPhone, isFalse);
       });
 
-      test('Should handle RangeError when substring operation fails', () {
-        when(() => mockDeviceInfo.data).thenReturn({
-          'utsname': {'machine': 'iP'} // Too short for substring
-        });
-
-        expect(parser.currentIPhone, isNull);
-        expect(parser.isTargetIPhone, isFalse);
-      });
-
-      test('Should handle generic Exception gracefully', () {
-        when(() => mockDeviceInfo.data).thenThrow(Exception('Unexpected error'));
-
-        expect(parser.currentIPhone, isNull);
-        expect(parser.isTargetIPhone, isFalse);
-        expect(parser.logoConstraints.maxHeight, equals(0));
-      });
-    });
-
-    group('Malformed Device Data Handling', () {
-      test('Should handle null utsname field', () {
-        when(() => mockDeviceInfo.data).thenReturn({
-          'utsname': null
-        });
-
-        expect(parser.currentIPhone, isNull);
-        expect(parser.isTargetIPhone, isFalse);
-      });
-
-      test('Should handle missing utsname field', () {
-        when(() => mockDeviceInfo.data).thenReturn({
-          'other_field': 'value'
-        });
-
-        expect(parser.currentIPhone, isNull);
-        expect(parser.isTargetIPhone, isFalse);
-      });
-
-      test('Should handle null machine field', () {
-        when(() => mockDeviceInfo.data).thenReturn({
-          'utsname': {'machine': null}
-        });
-
-        expect(parser.currentIPhone, isNull);
-        expect(parser.isTargetIPhone, isFalse);
-      });
-
-      test('Should handle missing machine field', () {
-        when(() => mockDeviceInfo.data).thenReturn({
-          'utsname': {'other_field': 'value'}
-        });
-
-        expect(parser.currentIPhone, isNull);
-        expect(parser.isTargetIPhone, isFalse);
-      });
-
-      test('Should handle non-string machine field', () {
-        when(() => mockDeviceInfo.data).thenReturn({
-          'utsname': {'machine': 12345} // Integer instead of string
-        });
-
-        expect(parser.currentIPhone, isNull);
-        expect(parser.isTargetIPhone, isFalse);
-      });
-
-      test('Should handle empty machine field', () {
-        when(() => mockDeviceInfo.data).thenReturn({
-          'utsname': {'machine': ''}
-        });
+      test('Should handle very short machine identifier', () {
+        final parser = HiddenLogoParser(machineIdentifier: 'iP');
 
         expect(parser.currentIPhone, isNull);
         expect(parser.isTargetIPhone, isFalse);
@@ -111,27 +30,23 @@ void main() {
 
     group('Invalid Device Code Scenarios', () {
       test('Should handle device code with unexpected format', () {
-        when(() => mockDeviceInfo.data).thenReturn({
-          'utsname': {'machine': 'iPhone-invalid-format'}
-        });
+        final parser = HiddenLogoParser(
+          machineIdentifier: 'iPhone-invalid-format',
+        );
 
         expect(parser.currentIPhone, isNull);
         expect(parser.isTargetIPhone, isFalse);
       });
 
       test('Should handle device code with special characters', () {
-        when(() => mockDeviceInfo.data).thenReturn({
-          'utsname': {'machine': 'iPhone@#\$%'}
-        });
+        final parser = HiddenLogoParser(machineIdentifier: r'iPhone@#$%');
 
         expect(parser.currentIPhone, isNull);
         expect(parser.isTargetIPhone, isFalse);
       });
 
       test('Should handle future unknown device codes gracefully', () {
-        when(() => mockDeviceInfo.data).thenReturn({
-          'utsname': {'machine': 'iPhone99,99'} // Future unknown device
-        });
+        final parser = HiddenLogoParser(machineIdentifier: 'iPhone99,99');
 
         expect(parser.currentIPhone, isNull);
         expect(parser.isTargetIPhone, isFalse);
@@ -141,45 +56,93 @@ void main() {
       });
 
       test('Should handle non-iPhone devices gracefully', () {
-        when(() => mockDeviceInfo.data).thenReturn({
-          'utsname': {'machine': 'iPad14,1'} // iPad device
-        });
+        final parser = HiddenLogoParser(machineIdentifier: 'iPad14,1');
+
+        expect(parser.currentIPhone, isNull);
+        expect(parser.isTargetIPhone, isFalse);
+      });
+
+      test('Should handle Mac identifier gracefully', () {
+        final parser = HiddenLogoParser(machineIdentifier: 'MacBookPro18,1');
+
+        expect(parser.currentIPhone, isNull);
+        expect(parser.isTargetIPhone, isFalse);
+      });
+
+      test('Should handle device code with whitespace', () {
+        final parser = HiddenLogoParser(machineIdentifier: 'iPhone 15,2');
+
+        expect(parser.currentIPhone, isNull);
+        expect(parser.isTargetIPhone, isFalse);
+      });
+
+      test('Should handle device code with leading whitespace', () {
+        final parser = HiddenLogoParser(machineIdentifier: ' iPhone15,2');
+
+        expect(parser.currentIPhone, isNull);
+        expect(parser.isTargetIPhone, isFalse);
+      });
+
+      test('Should handle device code with dot instead of comma', () {
+        final parser = HiddenLogoParser(machineIdentifier: 'iPhone15.2');
+
+        expect(parser.currentIPhone, isNull);
+        expect(parser.isTargetIPhone, isFalse);
+      });
+
+      test('Should handle device code with only prefix', () {
+        final parser = HiddenLogoParser(machineIdentifier: 'iPhone');
 
         expect(parser.currentIPhone, isNull);
         expect(parser.isTargetIPhone, isFalse);
       });
     });
 
-    group('Recovery from Failed Detection', () {
-      test('Should maintain consistent state after multiple errors', () {
-        // First call throws error
-        when(() => mockDeviceInfo.data).thenThrow(TypeError());
+    group('Simulator Identifiers', () {
+      test('Should handle x86_64 simulator identifier', () {
+        final parser = HiddenLogoParser(machineIdentifier: 'x86_64');
+
         expect(parser.currentIPhone, isNull);
-
-        // Second call returns valid data
-        when(() => mockDeviceInfo.data).thenReturn(
-            TestUtils.buildMockDeviceInfoDataMap('iPhone15,2'));
-
-        // Parser should recover and work correctly
-        expect(parser.currentIPhone, isNotNull);
-        expect(parser.isTargetIPhone, isTrue);
-        expect(parser.logoConstraints.maxHeight, greaterThan(0));
+        expect(parser.isTargetIPhone, isFalse);
       });
 
-      test('Should handle alternating valid and invalid data', () {
-        // Start with valid data
-        when(() => mockDeviceInfo.data).thenReturn(
-            TestUtils.buildMockDeviceInfoDataMap('iPhone15,2'));
-        expect(parser.currentIPhone, isNotNull);
+      test('Should handle arm64 simulator identifier', () {
+        final parser = HiddenLogoParser(machineIdentifier: 'arm64');
 
-        // Switch to invalid data
-        when(() => mockDeviceInfo.data).thenReturn({});
         expect(parser.currentIPhone, isNull);
+        expect(parser.isTargetIPhone, isFalse);
+      });
 
-        // Switch back to valid data
-        when(() => mockDeviceInfo.data).thenReturn(
-            TestUtils.buildMockDeviceInfoDataMap('iPhone10,6'));
-        expect(parser.currentIPhone, isNotNull);
+      test('Should handle i386 simulator identifier', () {
+        final parser = HiddenLogoParser(machineIdentifier: 'i386');
+
+        expect(parser.currentIPhone, isNull);
+        expect(parser.isTargetIPhone, isFalse);
+      });
+    });
+
+    group('Valid Device Parsing', () {
+      test('Should correctly parse valid iPhone identifier', () {
+        final parser = HiddenLogoParser(machineIdentifier: 'iPhone15,2');
+
+        expect(parser.currentIPhone, DeviceModel.iPhone14Pro);
+        expect(parser.isTargetIPhone, isTrue);
+        expect(parser.logoConstraints.maxHeight, greaterThan(0));
+        expect(parser.logoConstraints.maxWidth, greaterThan(0));
+      });
+
+      test('Should correctly parse oldest supported iPhone', () {
+        final parser = HiddenLogoParser(machineIdentifier: 'iPhone10,6');
+
+        expect(parser.currentIPhone, DeviceModel.iPhoneX);
+        expect(parser.isTargetIPhone, isTrue);
+      });
+
+      test('Should correctly parse newest supported iPhone', () {
+        final parser = HiddenLogoParser(machineIdentifier: 'iPhone18,4');
+
+        expect(parser.currentIPhone, DeviceModel.iPhoneAir);
+        expect(parser.isTargetIPhone, isTrue);
       });
     });
   });
