@@ -1,3 +1,11 @@
+## 1.1.0
+
+* Add support for iPhone 17e
+* Fix initial foreground state detection on app startup
+* Fix race condition in device info caching
+* Improve switch exhaustiveness in parser for safer new device additions
+* Improve test determinism and reliability
+
 ## 1.0.0
 
 **BREAKING: Converted from package to plugin** (no migration needed)
@@ -8,8 +16,6 @@ Removed `device_info_plus` dependency - plugin now uses native platform channels
 * Refactored internal parsing logic
 * Lowered minimum Dart SDK to 3.0.0 from 3.7.0
 * Updated tests to match new API
-
----
 
 ## 0.2.0
 

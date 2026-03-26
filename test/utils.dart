@@ -21,7 +21,7 @@ class TestUtils {
     return '${withPrefix ? 'iPhone' : ''}$code';
   }
 
-  static final _iPhonesWithNotch = [
+  static final iPhonesWithNotch = [
     DeviceModel.iPhoneX,
     DeviceModel.iPhoneXs,
     DeviceModel.iPhoneXsMax,
@@ -40,9 +40,10 @@ class TestUtils {
     DeviceModel.iPhone14,
     DeviceModel.iPhone14Plus,
     DeviceModel.iPhone16e,
+    DeviceModel.iPhone17e,
   ];
 
-  static final _iPhonesWithDynamicIsland = [
+  static final iPhonesWithDynamicIsland = [
     DeviceModel.iPhone14Pro,
     DeviceModel.iPhone14ProMax,
     DeviceModel.iPhone15,
@@ -59,12 +60,11 @@ class TestUtils {
     DeviceModel.iPhone17ProMax,
   ];
 
-  static DeviceModel getRandomIPhone({LogoType? logoType}) {
-    final listToChooseFrom = switch (logoType) {
-      LogoType.notch => [..._iPhonesWithNotch],
-      LogoType.dynamicIsland => [..._iPhonesWithDynamicIsland],
-      null => [..._iPhonesWithNotch, ..._iPhonesWithDynamicIsland],
+  static DeviceModel getIPhone({LogoType? logoType}) {
+    return switch (logoType) {
+      LogoType.notch => iPhonesWithNotch.first,
+      LogoType.dynamicIsland => iPhonesWithDynamicIsland.first,
+      null => iPhonesWithNotch.first,
     };
-    return (listToChooseFrom..shuffle()).first;
   }
 }

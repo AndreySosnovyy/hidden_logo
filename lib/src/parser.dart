@@ -10,7 +10,7 @@ import 'package:flutter/widgets.dart';
 /// screenshots or when the app is minimized.
 /// {@endtemplate}
 enum LogoType {
-  /// Hardware barrier found on iPhones from iPhone X to iPhone 16e.
+  /// Hardware barrier found on iPhones from iPhone X to iPhone 17e.
   ///
   /// The notch is a black cutout at the top center of the screen that
   /// houses the front camera and sensors. Logos placed behind the notch
@@ -36,7 +36,7 @@ enum LogoType {
 /// requirements for optimal logo placement.
 ///
 /// The supported models are categorized into two groups:
-/// - **Notch devices**: iPhone X through iPhone 16e
+/// - **Notch devices**: iPhone X through iPhone 17e
 /// - **Dynamic Island devices**: iPhone 14 Pro series through iPhone 17 series
 ///
 /// See [LogoType] for the hardware barrier types.
@@ -137,6 +137,9 @@ enum DeviceModel {
 
   /// iPhone 17 Pro Max
   iPhone17ProMax,
+
+  /// iPhone 17e
+  iPhone17e,
 }
 
 /// {@template hidden_logo.HiddenLogoParser}
@@ -180,6 +183,7 @@ class HiddenLogoParser {
     '18,2': DeviceModel.iPhone17ProMax,
     '18,3': DeviceModel.iPhone17,
     '18,4': DeviceModel.iPhoneAir,
+    '18,5': DeviceModel.iPhone17e,
   };
 
   /// Returns the machine identifier suffix for a given iPhone model.
@@ -215,19 +219,19 @@ class HiddenLogoParser {
   ///
   /// Use `null` instead of empty string when no identifier is available.
   HiddenLogoParser({required this.machineIdentifier})
-    : assert(
-        machineIdentifier == null || machineIdentifier.isNotEmpty,
-        'machineIdentifier must not be empty, use null instead',
-      ),
-      assert(
-        machineIdentifier == null ||
-            machineIdentifier.trim() == machineIdentifier,
-        'machineIdentifier must not have leading or trailing whitespace',
-      ),
-      assert(
-        machineIdentifier == null || !machineIdentifier.contains(' '),
-        'machineIdentifier must not contain whitespace',
-      );
+      : assert(
+          machineIdentifier == null || machineIdentifier.isNotEmpty,
+          'machineIdentifier must not be empty, use null instead',
+        ),
+        assert(
+          machineIdentifier == null ||
+              machineIdentifier.trim() == machineIdentifier,
+          'machineIdentifier must not have leading or trailing whitespace',
+        ),
+        assert(
+          machineIdentifier == null || !machineIdentifier.contains(' '),
+          'machineIdentifier must not contain whitespace',
+        );
 
   /// iOS machine identifier (e.g., "iPhone15,2")
   final String? machineIdentifier;
@@ -277,8 +281,28 @@ class HiddenLogoParser {
       case DeviceModel.iPhone17Pro:
       case DeviceModel.iPhone17ProMax:
         return LogoType.dynamicIsland;
-      default:
+      case DeviceModel.iPhoneX:
+      case DeviceModel.iPhoneXr:
+      case DeviceModel.iPhoneXs:
+      case DeviceModel.iPhoneXsMax:
+      case DeviceModel.iPhone11:
+      case DeviceModel.iPhone11Pro:
+      case DeviceModel.iPhone11ProMax:
+      case DeviceModel.iPhone12:
+      case DeviceModel.iPhone12Mini:
+      case DeviceModel.iPhone12Pro:
+      case DeviceModel.iPhone12ProMax:
+      case DeviceModel.iPhone13:
+      case DeviceModel.iPhone13Mini:
+      case DeviceModel.iPhone13Pro:
+      case DeviceModel.iPhone13ProMax:
+      case DeviceModel.iPhone14:
+      case DeviceModel.iPhone14Plus:
+      case DeviceModel.iPhone16e:
+      case DeviceModel.iPhone17e:
         return LogoType.notch;
+      case null:
+        throw StateError('iPhonesLogoType called on non-target device');
     }
   }
 
@@ -303,15 +327,9 @@ class HiddenLogoParser {
     if (machineId == null || machineId.isEmpty) return null;
     if (!machineId.startsWith('iPhone')) return null;
 
-    try {
-      final id = machineId.substring('iPhone'.length);
-      if (id.isEmpty) return null;
-      return _iPhoneMachineIdentifiersMap[id];
-    } on RangeError catch (_) {
-      return null;
-    } catch (_) {
-      return null;
-    }
+    final id = machineId.substring('iPhone'.length);
+    if (id.isEmpty) return null;
+    return _iPhoneMachineIdentifiersMap[id];
   }
 
   /// Whether the current device supports logo placement.
@@ -373,6 +391,7 @@ class HiddenLogoParser {
       case DeviceModel.iPhone14Plus:
       case DeviceModel.iPhone13:
       case DeviceModel.iPhone16e:
+      case DeviceModel.iPhone17e:
         return const BoxConstraints(maxHeight: 33.0, maxWidth: 162.0);
 
       case DeviceModel.iPhoneXr:
@@ -449,7 +468,26 @@ class HiddenLogoParser {
         return 14.0;
       case DeviceModel.iPhoneAir:
         return 20.0;
-      default:
+      case DeviceModel.iPhoneX:
+      case DeviceModel.iPhoneXr:
+      case DeviceModel.iPhoneXs:
+      case DeviceModel.iPhoneXsMax:
+      case DeviceModel.iPhone11:
+      case DeviceModel.iPhone11Pro:
+      case DeviceModel.iPhone11ProMax:
+      case DeviceModel.iPhone12:
+      case DeviceModel.iPhone12Mini:
+      case DeviceModel.iPhone12Pro:
+      case DeviceModel.iPhone12ProMax:
+      case DeviceModel.iPhone13:
+      case DeviceModel.iPhone13Mini:
+      case DeviceModel.iPhone13Pro:
+      case DeviceModel.iPhone13ProMax:
+      case DeviceModel.iPhone14:
+      case DeviceModel.iPhone14Plus:
+      case DeviceModel.iPhone16e:
+      case DeviceModel.iPhone17e:
+      case null:
         return 0.0;
     }
   }

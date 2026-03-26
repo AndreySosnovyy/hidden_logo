@@ -35,8 +35,7 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _isForeground =
-        WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
+    _isForeground = true;
     _machineIdFuture = DeviceInfoService.getMachineIdentifier();
   }
 
@@ -84,18 +83,17 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
                       padding: EdgeInsets.only(
                         top: parser.dynamicIslandTopMargin,
                       ),
-                      child:
-                          parser.iPhonesLogoType == LogoType.notch
-                              ? widget.notchBuilder(context, constraints)
-                              : ClipRRect(
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(100.0),
-                                ),
-                                child: widget.dynamicIslandBuilder(
-                                  context,
-                                  constraints,
-                                ),
+                      child: parser.iPhonesLogoType == LogoType.notch
+                          ? widget.notchBuilder(context, constraints)
+                          : ClipRRect(
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(100.0),
                               ),
+                              child: widget.dynamicIslandBuilder(
+                                context,
+                                constraints,
+                              ),
+                            ),
                     ),
                   ),
               ],

@@ -78,10 +78,24 @@ void main() {
             : const Size(600, 800),
       );
 
-  String getRandomMachineIdentifier({LogoType? logoType}) =>
+  String getMachineIdentifier({LogoType? logoType}) =>
       TestUtils.getMachineIdentifier(
-        TestUtils.getRandomIPhone(logoType: logoType),
+        TestUtils.getIPhone(logoType: logoType),
       );
+
+  /// Simulates app going to background by sending a lifecycle event and
+  /// forcing a frame rebuild. This is needed because [AppLifecycleState.paused],
+  /// [AppLifecycleState.hidden], and [AppLifecycleState.detached] disable
+  /// frame scheduling in [SchedulerBinding], so [pumpAndSettle] alone
+  /// won't trigger a rebuild.
+  Future<void> goToBackground(
+    WidgetTester tester,
+    AppLifecycleState state,
+  ) async {
+    tester.binding.handleAppLifecycleStateChanged(state);
+    tester.binding.scheduleForcedFrame();
+    await tester.pump();
+  }
 
   group('FutureBuilder loading state', () {
     testWidgets('Should display body while device info is loading', (
@@ -109,7 +123,7 @@ void main() {
         await setOrientation(Orientation.portrait);
         const notchKey = ValueKey('notch');
         DeviceInfoService.setMockMachineIdentifier(
-          getRandomMachineIdentifier(logoType: LogoType.notch),
+          getMachineIdentifier(logoType: LogoType.notch),
         );
         await tester.pumpWidget(
           const EmptyAppWithHiddenLogo(notchKey: notchKey),
@@ -125,7 +139,7 @@ void main() {
       await setOrientation(Orientation.portrait);
       const notchKey = ValueKey('notch');
       DeviceInfoService.setMockMachineIdentifier(
-        getRandomMachineIdentifier(logoType: LogoType.notch),
+        getMachineIdentifier(logoType: LogoType.notch),
       );
       await tester.pumpWidget(
         const EmptyAppWithHiddenLogo(notchKey: notchKey, isVisible: false),
@@ -144,7 +158,7 @@ void main() {
         );
         const notchKey = ValueKey('notch');
         DeviceInfoService.setMockMachineIdentifier(
-          getRandomMachineIdentifier(logoType: LogoType.notch),
+          getMachineIdentifier(logoType: LogoType.notch),
         );
         await tester.pumpWidget(
           const EmptyAppWithHiddenLogo(
@@ -164,7 +178,7 @@ void main() {
         await setOrientation(Orientation.portrait);
         const notchKey = ValueKey('notch');
         DeviceInfoService.setMockMachineIdentifier(
-          getRandomMachineIdentifier(logoType: LogoType.notch),
+          getMachineIdentifier(logoType: LogoType.notch),
         );
         await tester.pumpWidget(
           const EmptyAppWithHiddenLogo(
@@ -173,8 +187,7 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
-        await tester.pumpAndSettle();
+        await goToBackground(tester, AppLifecycleState.paused);
         expect(find.byKey(notchKey), findsOneWidget);
       },
     );
@@ -186,7 +199,7 @@ void main() {
         await setOrientation(Orientation.portrait);
         const notchKey = ValueKey('notch');
         DeviceInfoService.setMockMachineIdentifier(
-          getRandomMachineIdentifier(logoType: LogoType.notch),
+          getMachineIdentifier(logoType: LogoType.notch),
         );
         await tester.pumpWidget(
           const EmptyAppWithHiddenLogo(
@@ -195,8 +208,7 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
-        await tester.pumpAndSettle();
+        await goToBackground(tester, AppLifecycleState.paused);
         expect(find.byKey(notchKey), findsOneWidget);
         tester.binding.handleAppLifecycleStateChanged(
           AppLifecycleState.resumed,
@@ -224,7 +236,7 @@ void main() {
       await setOrientation(Orientation.landscape);
       const notchKey = ValueKey('notch');
       DeviceInfoService.setMockMachineIdentifier(
-        getRandomMachineIdentifier(logoType: LogoType.notch),
+        getMachineIdentifier(logoType: LogoType.notch),
       );
       await tester.pumpWidget(const EmptyAppWithHiddenLogo(notchKey: notchKey));
       await tester.pumpAndSettle();
@@ -238,7 +250,7 @@ void main() {
       await setOrientation(Orientation.portrait);
       const notchKey = ValueKey('notch');
       DeviceInfoService.setMockMachineIdentifier(
-        getRandomMachineIdentifier(logoType: LogoType.notch),
+        getMachineIdentifier(logoType: LogoType.notch),
       );
       await tester.pumpWidget(const EmptyAppWithHiddenLogo(notchKey: notchKey));
       await tester.pumpAndSettle();
@@ -255,7 +267,7 @@ void main() {
       await setOrientation(Orientation.landscape);
       const notchKey = ValueKey('notch');
       DeviceInfoService.setMockMachineIdentifier(
-        getRandomMachineIdentifier(logoType: LogoType.notch),
+        getMachineIdentifier(logoType: LogoType.notch),
       );
       await tester.pumpWidget(const EmptyAppWithHiddenLogo(notchKey: notchKey));
       await tester.pumpAndSettle();
@@ -274,7 +286,7 @@ void main() {
         await setOrientation(Orientation.portrait);
         const dynamicIslandKey = ValueKey('dynamic_island');
         DeviceInfoService.setMockMachineIdentifier(
-          getRandomMachineIdentifier(logoType: LogoType.dynamicIsland),
+          getMachineIdentifier(logoType: LogoType.dynamicIsland),
         );
         await tester.pumpWidget(
           const EmptyAppWithHiddenLogo(dynamicIslandKey: dynamicIslandKey),
@@ -290,7 +302,7 @@ void main() {
         await setOrientation(Orientation.portrait);
         const dynamicIslandKey = ValueKey('dynamic_island');
         DeviceInfoService.setMockMachineIdentifier(
-          getRandomMachineIdentifier(logoType: LogoType.dynamicIsland),
+          getMachineIdentifier(logoType: LogoType.dynamicIsland),
         );
         await tester.pumpWidget(
           const EmptyAppWithHiddenLogo(
@@ -313,7 +325,7 @@ void main() {
         );
         const dynamicIslandKey = ValueKey('dynamic_island');
         DeviceInfoService.setMockMachineIdentifier(
-          getRandomMachineIdentifier(logoType: LogoType.dynamicIsland),
+          getMachineIdentifier(logoType: LogoType.dynamicIsland),
         );
         await tester.pumpWidget(
           const EmptyAppWithHiddenLogo(
@@ -333,7 +345,7 @@ void main() {
         await setOrientation(Orientation.portrait);
         const dynamicIslandKey = ValueKey('dynamic_island');
         DeviceInfoService.setMockMachineIdentifier(
-          getRandomMachineIdentifier(logoType: LogoType.dynamicIsland),
+          getMachineIdentifier(logoType: LogoType.dynamicIsland),
         );
         await tester.pumpWidget(
           const EmptyAppWithHiddenLogo(
@@ -342,8 +354,7 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
-        await tester.pumpAndSettle();
+        await goToBackground(tester, AppLifecycleState.paused);
         expect(find.byKey(dynamicIslandKey), findsOneWidget);
       },
     );
@@ -355,7 +366,7 @@ void main() {
         await setOrientation(Orientation.portrait);
         const dynamicIslandKey = ValueKey('dynamic_island');
         DeviceInfoService.setMockMachineIdentifier(
-          getRandomMachineIdentifier(logoType: LogoType.dynamicIsland),
+          getMachineIdentifier(logoType: LogoType.dynamicIsland),
         );
         await tester.pumpWidget(
           const EmptyAppWithHiddenLogo(
@@ -364,8 +375,7 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
-        await tester.pumpAndSettle();
+        await goToBackground(tester, AppLifecycleState.paused);
         expect(find.byKey(dynamicIslandKey), findsOneWidget);
         tester.binding.handleAppLifecycleStateChanged(
           AppLifecycleState.resumed,
@@ -396,7 +406,7 @@ void main() {
         await setOrientation(Orientation.landscape);
         const dynamicIslandKey = ValueKey('dynamic_island');
         DeviceInfoService.setMockMachineIdentifier(
-          getRandomMachineIdentifier(logoType: LogoType.dynamicIsland),
+          getMachineIdentifier(logoType: LogoType.dynamicIsland),
         );
         await tester.pumpWidget(
           const EmptyAppWithHiddenLogo(dynamicIslandKey: dynamicIslandKey),
@@ -413,7 +423,7 @@ void main() {
       await setOrientation(Orientation.portrait);
       const dynamicIslandKey = ValueKey('dynamic_island');
       DeviceInfoService.setMockMachineIdentifier(
-        getRandomMachineIdentifier(logoType: LogoType.dynamicIsland),
+        getMachineIdentifier(logoType: LogoType.dynamicIsland),
       );
       await tester.pumpWidget(
         const EmptyAppWithHiddenLogo(dynamicIslandKey: dynamicIslandKey),
@@ -432,7 +442,7 @@ void main() {
       await setOrientation(Orientation.landscape);
       const dynamicIslandKey = ValueKey('dynamic_island');
       DeviceInfoService.setMockMachineIdentifier(
-        getRandomMachineIdentifier(logoType: LogoType.dynamicIsland),
+        getMachineIdentifier(logoType: LogoType.dynamicIsland),
       );
       await tester.pumpWidget(
         const EmptyAppWithHiddenLogo(dynamicIslandKey: dynamicIslandKey),
@@ -534,29 +544,13 @@ void main() {
   });
 
   group('Device-specific Dynamic Island tests', () {
-    final dynamicIslandDevices = {
-      'iPhone14Pro': 'iPhone15,2',
-      'iPhone14ProMax': 'iPhone15,3',
-      'iPhone15': 'iPhone15,4',
-      'iPhone15Plus': 'iPhone15,5',
-      'iPhone15Pro': 'iPhone16,1',
-      'iPhone15ProMax': 'iPhone16,2',
-      'iPhone16': 'iPhone17,3',
-      'iPhone16Plus': 'iPhone17,4',
-      'iPhone16Pro': 'iPhone17,1',
-      'iPhone16ProMax': 'iPhone17,2',
-      'iPhone17': 'iPhone18,3',
-      'iPhoneAir': 'iPhone18,4',
-      'iPhone17Pro': 'iPhone18,1',
-      'iPhone17ProMax': 'iPhone18,2',
-    };
-
-    dynamicIslandDevices.forEach((deviceName, deviceCode) {
-      testWidgets('$deviceName should display Dynamic Island logo', (
+    for (final device in TestUtils.iPhonesWithDynamicIsland) {
+      testWidgets('${device.name} should display Dynamic Island logo', (
         tester,
       ) async {
         await setOrientation(Orientation.portrait);
         const dynamicIslandKey = ValueKey('dynamic_island');
+        final deviceCode = TestUtils.getMachineIdentifier(device);
         DeviceInfoService.setMockMachineIdentifier(deviceCode);
         await tester.pumpWidget(
           const EmptyAppWithHiddenLogo(dynamicIslandKey: dynamicIslandKey),
@@ -566,7 +560,7 @@ void main() {
         final parser = HiddenLogoParser(machineIdentifier: deviceCode);
         expect(parser.iPhonesLogoType, equals(LogoType.dynamicIsland));
       });
-    });
+    }
   });
 
   group('Dynamic Island ClipRRect', () {
@@ -600,7 +594,7 @@ void main() {
         await setOrientation(Orientation.portrait);
         const notchKey = ValueKey('notch');
         DeviceInfoService.setMockMachineIdentifier(
-          getRandomMachineIdentifier(logoType: LogoType.notch),
+          getMachineIdentifier(logoType: LogoType.notch),
         );
         await tester.pumpWidget(
           const EmptyAppWithHiddenLogo(
@@ -623,7 +617,7 @@ void main() {
         await setOrientation(Orientation.portrait);
         const notchKey = ValueKey('notch');
         DeviceInfoService.setMockMachineIdentifier(
-          getRandomMachineIdentifier(logoType: LogoType.notch),
+          getMachineIdentifier(logoType: LogoType.notch),
         );
         await tester.pumpWidget(
           const EmptyAppWithHiddenLogo(
@@ -632,8 +626,7 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
-        await tester.pumpAndSettle();
+        await goToBackground(tester, AppLifecycleState.hidden);
         expect(find.byKey(notchKey), findsOneWidget);
       },
     );
@@ -644,7 +637,7 @@ void main() {
         await setOrientation(Orientation.portrait);
         const notchKey = ValueKey('notch');
         DeviceInfoService.setMockMachineIdentifier(
-          getRandomMachineIdentifier(logoType: LogoType.notch),
+          getMachineIdentifier(logoType: LogoType.notch),
         );
         await tester.pumpWidget(
           const EmptyAppWithHiddenLogo(
@@ -653,10 +646,7 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        tester.binding.handleAppLifecycleStateChanged(
-          AppLifecycleState.detached,
-        );
-        await tester.pumpAndSettle();
+        await goToBackground(tester, AppLifecycleState.detached);
         expect(find.byKey(notchKey), findsOneWidget);
       },
     );

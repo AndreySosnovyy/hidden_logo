@@ -113,6 +113,7 @@ Device → Trigger Screenshot)
 | 14         |                |
 | 14 Plus    |                |
 | 16e        |                |
+| 17e        |                |
 
 ## About new devices support
 

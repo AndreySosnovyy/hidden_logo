@@ -32,6 +32,7 @@ void main() {
     testConstraintsParsing(DeviceModel.iPhone14Plus, bc330x1620);
     testConstraintsParsing(DeviceModel.iPhone13, bc330x1620);
     testConstraintsParsing(DeviceModel.iPhone16e, bc330x1620);
+    testConstraintsParsing(DeviceModel.iPhone17e, bc330x1620);
     const bc330x2300 = BoxConstraints(maxHeight: 33.0, maxWidth: 230.0);
     testConstraintsParsing(DeviceModel.iPhoneXr, bc330x2300);
     testConstraintsParsing(DeviceModel.iPhone11, bc330x2300);
@@ -97,6 +98,7 @@ void main() {
     testTopMarginParsing(DeviceModel.iPhone14, 0);
     testTopMarginParsing(DeviceModel.iPhone14Plus, 0);
     testTopMarginParsing(DeviceModel.iPhone16e, 0);
+    testTopMarginParsing(DeviceModel.iPhone17e, 0);
     testTopMarginParsing(DeviceModel.iPhone14Pro, 11.3);
     testTopMarginParsing(DeviceModel.iPhone14ProMax, 11.3);
     testTopMarginParsing(DeviceModel.iPhone15, 11.3);

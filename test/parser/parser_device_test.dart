@@ -108,6 +108,7 @@ void main() {
     testCodeParsing('iPhone18,2', DeviceModel.iPhone17ProMax);
     testCodeParsing('iPhone18,3', DeviceModel.iPhone17);
     testCodeParsing('iPhone18,4', DeviceModel.iPhoneAir);
+    testCodeParsing('iPhone18,5', DeviceModel.iPhone17e);
   });
 
   group('Logo types for iPhones', () {
@@ -140,6 +141,7 @@ void main() {
     testLogoTypeParsing(DeviceModel.iPhone14, LogoType.notch);
     testLogoTypeParsing(DeviceModel.iPhone14Plus, LogoType.notch);
     testLogoTypeParsing(DeviceModel.iPhone16e, LogoType.notch);
+    testLogoTypeParsing(DeviceModel.iPhone17e, LogoType.notch);
     testLogoTypeParsing(DeviceModel.iPhone14Pro, LogoType.dynamicIsland);
     testLogoTypeParsing(DeviceModel.iPhone14ProMax, LogoType.dynamicIsland);
     testLogoTypeParsing(DeviceModel.iPhone15, LogoType.dynamicIsland);
