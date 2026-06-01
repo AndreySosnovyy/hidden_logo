@@ -1,0 +1,43 @@
+# Dev tooling
+node_modules/
+package.json
+package-lock.json
+
+# Build artefacts
+build/
+.dart_tool/
+coverage/
+
+# Pub / Flutter dev artefacts
+pubspec.lock
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+**/doc/api/
+*.log
+
+# OS / misc
+.DS_Store
+**/.DS_Store
+*.swp
+.history
+
+# IDE / local config
+.claude/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# SPM artefacts
+.build/
+.swiftpm/
+
+# Example native build artefacts (gitignore-семантика matches на любом уровне)
+**/.symlinks/
+**/.plugin_symlinks/
+**/Pods/
+**/ephemeral/
+**/Generated.xcconfig
+**/flutter_export_environment.sh
+**/xcuserdata/

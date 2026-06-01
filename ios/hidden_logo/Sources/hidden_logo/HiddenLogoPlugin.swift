@@ -21,16 +21,16 @@ public class HiddenLogoPlugin: NSObject, FlutterPlugin {
     }
 
     private func getMachineIdentifier() -> String? {
-        if let simulatorModelIdentifier = ProcessInfo().environment["SIMULATOR_MODEL_IDENTIFIER"] {
+        if let simulatorModelIdentifier = ProcessInfo.processInfo.environment["SIMULATOR_MODEL_IDENTIFIER"] {
             return simulatorModelIdentifier
         }
 
         var systemInfo = utsname()
         uname(&systemInfo)
-        let machine = withUnsafePointer(to: &systemInfo.machine) {
-            $0.withMemoryRebound(to: CChar.self, capacity: 1) {
-                String(validatingUTF8: $0)
-            }
+        let machine = withUnsafeBytes(of: &systemInfo.machine) { rawBuffer -> String? in
+            let buffer = rawBuffer.bindMemory(to: CChar.self)
+            guard let baseAddress = buffer.baseAddress else { return nil }
+            return String(validatingUTF8: baseAddress)
         }
         return machine
     }

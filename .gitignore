@@ -27,8 +27,24 @@ migrate_working_dir/
 **/doc/api/
 .dart_tool/
 .packages
+.flutter-plugins
+.flutter-plugins-dependencies
 build/
 /coverage/lcov.info
 
 # Claude Code
 .claude/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Generated Flutter plugin artefacts
+**/.plugin_symlinks/
+**/flutter/ephemeral/
+**/Flutter/ephemeral/
+
+# Node tooling (hookify и пр.)
+node_modules/
+package.json
+package-lock.json

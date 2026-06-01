@@ -35,12 +35,15 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _isForeground = true;
+    final lifecycleState = WidgetsBinding.instance.lifecycleState;
+    _isForeground =
+        lifecycleState == null || lifecycleState == AppLifecycleState.resumed;
     _machineIdFuture = DeviceInfoService.getMachineIdentifier();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    final wasForeground = _isForeground;
     switch (state) {
       case AppLifecycleState.resumed:
         _isForeground = true;
@@ -51,7 +54,12 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
         _isForeground = false;
     }
     super.didChangeAppLifecycleState(state);
-    setState(() {});
+    // The logo's visibility depends on foreground state only in
+    // onlyInBackground mode. Avoid rebuilding the whole subtree otherwise.
+    if (_isForeground != wasForeground &&
+        widget.visibilityMode == LogoVisibilityMode.onlyInBackground) {
+      setState(() {});
+    }
   }
 
   @override

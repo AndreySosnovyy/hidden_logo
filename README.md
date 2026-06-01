@@ -1,6 +1,6 @@
 ## Features
 
-The **hidden_logo** package allows you to add any Flutter widget under the Notch or
+The **hidden_logo** plugin allows you to add any Flutter widget under the Notch or
 the Dynamic Island for iPhones. It can be your brand logo or its simplified version.
 They will only be visible for users in certain scenarios, for example when a user
 takes a screenshot of your app, minimizes it or uses some kind of screen mirroring.
@@ -23,6 +23,12 @@ takes a screenshot of your app, minimizes it or uses some kind of screen mirrori
   be worried about the size of your child widget.
 - Corners of your Dynamic Island widget will be **rounded automatically**.
 - Your child widget will only be visible in **portrait mode**.
+
+## Requirements
+
+- Flutter ≥3.24.0
+- iOS ≥13.0
+- Swift Package Manager works out of the box; CocoaPods is also supported
 
 ## Usage
 
@@ -119,11 +125,11 @@ Device → Trigger Screenshot)
 
 When the new iPhones are released, your logos won't appear on their screens because
 the actual shape and size configuration of further devices are unknown in advance.
-But the package will be updated as soon as possible when all necessary SDKs are available!
+But the plugin will be updated as soon as possible when all necessary SDKs are available!
 
 ### Contribute 🛠
 
-You can also contribute to this package on [GitHub](https://github.com/AndreySosnovyy/hidden_logo). </br>
+You can also contribute to this plugin on [GitHub](https://github.com/AndreySosnovyy/hidden_logo). </br>
 Suggest your ideas or bug reports by opening an [issue](https://github.com/AndreySosnovyy/hidden_logo/issues/new) or
 creating a [pull request](https://github.com/AndreySosnovyy/hidden_logo/pulls).
 </br>

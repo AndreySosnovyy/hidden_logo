@@ -1,4 +1,4 @@
-name: Flutter Tests
+name: Flutter CI
 
 on:
   push:
@@ -9,22 +9,58 @@ on:
       - main
 
 jobs:
-  test:
+  analyze-and-test:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: 3.24.0
-        channel: 'stable'
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.24.0
+          channel: 'stable'
 
-    - name: Install dependencies
-      run: flutter pub get
+      - name: Install dependencies
+        run: flutter pub get
 
-    - name: Run tests
-      run: flutter test
-  
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Validate package (dry run)
+        run: flutter pub publish --dry-run
+
+  ios-build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.24.0
+          channel: 'stable'
+
+      - name: Build example (Swift Package Manager)
+        working-directory: example
+        run: |
+          flutter config --enable-swift-package-manager
+          flutter pub get
+          flutter build ios --release --no-codesign
+
+      - name: Build example (CocoaPods)
+        working-directory: example
+        run: |
+          flutter config --no-enable-swift-package-manager
+          flutter clean
+          flutter pub get
+          flutter build ios --release --no-codesign

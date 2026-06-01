@@ -2,6 +2,10 @@
 
 1) **lib/src/parser.dart**: code parsing, constraints parsing
 
+## ios (native)
+
+1) **ios/hidden_logo/Sources/hidden_logo/HiddenLogoPlugin.swift**: native iOS logic (only if device detection on the native side needs changes)
+
 ## test
 
 1) **utils.dart**: add reverse code parsing, hardcode to lists
