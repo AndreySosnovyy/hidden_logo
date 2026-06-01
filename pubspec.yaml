@@ -1,23 +1,24 @@
 name: hidden_logo
 description: Plugin that allows you to display hidden logo behind hardware barriers for iPhones
-version: 1.1.0
+version: 1.2.0
 repository: https://github.com/AndreySosnovyy/hidden_logo
 issue_tracker: https://github.com/AndreySosnovyy/hidden_logo/issues
 topics: [ widget, ui, logo, brand, dynamic-island ]
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
-  flutter: '>=3.10.0'
+  flutter: '>=3.24.0'
 
 dependencies:
   flutter:
+    sdk: flutter
+  flutter_web_plugins:
     sdk: flutter
 
 dev_dependencies:
   flutter_lints: '>=3.0.0 <7.0.0'
   flutter_test:
     sdk: flutter
-  mocktail: '>=1.0.4 <2.0.0'
 
 flutter:
   plugin:
@@ -32,3 +33,6 @@ flutter:
         dartPluginClass: HLStub
       windows:
         dartPluginClass: HLStub
+      web:
+        pluginClass: HLStub
+        fileName: hidden_logo_stub.dart

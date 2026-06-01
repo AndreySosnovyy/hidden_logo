@@ -10,7 +10,9 @@ import 'package:flutter/widgets.dart';
 /// screenshots or when the app is minimized.
 /// {@endtemplate}
 enum LogoType {
-  /// Hardware barrier found on iPhones from iPhone X to iPhone 17e.
+  /// Hardware barrier found on most iPhones from iPhone X onward, except the
+  /// models that use the Dynamic Island. The iPhone 16e and 17e use a notch
+  /// despite being newer than the first Dynamic Island devices.
   ///
   /// The notch is a black cutout at the top center of the screen that
   /// houses the front camera and sensors. Logos placed behind the notch
@@ -18,7 +20,8 @@ enum LogoType {
   /// and when the app is minimized.
   notch,
 
-  /// Hardware barrier found on iPhones from iPhone 14 Pro onwards.
+  /// Hardware barrier found on iPhone 14 Pro/Pro Max and all iPhone 15 and
+  /// later models, except the iPhone 16e and 17e which use a notch.
   ///
   /// The Dynamic Island is a pill-shaped interactive area at the top
   /// center of the screen. It's smaller than the notch and has rounded
@@ -36,8 +39,9 @@ enum LogoType {
 /// requirements for optimal logo placement.
 ///
 /// The supported models are categorized into two groups:
-/// - **Notch devices**: iPhone X through iPhone 17e
-/// - **Dynamic Island devices**: iPhone 14 Pro series through iPhone 17 series
+/// - **Dynamic Island devices**: iPhone 14 Pro/Pro Max and iPhone 15 and later,
+///   except the iPhone 16e and 17e
+/// - **Notch devices**: all other supported models
 ///
 /// See [LogoType] for the hardware barrier types.
 /// {@endtemplate}
@@ -247,8 +251,9 @@ class HiddenLogoParser {
 
   /// The hardware barrier type for the current iPhone.
   ///
-  /// Returns [LogoType.notch] for iPhone models from iPhone X through iPhone 16e,
-  /// and [LogoType.dynamicIsland] for iPhone 14 Pro series through iPhone 17 series.
+  /// Returns [LogoType.dynamicIsland] for iPhone 14 Pro/Pro Max and iPhone 15
+  /// and later (except the iPhone 16e and 17e), and [LogoType.notch] for all
+  /// other supported models.
   ///
   /// **Important**: This getter assumes the device is a target iPhone. It will
   /// throw an assertion error if called on a non-target device. Always check
@@ -322,7 +327,9 @@ class HiddenLogoParser {
   ///   // Handle iPhone X specific logic
   /// }
   /// ```
-  DeviceModel? get currentIPhone {
+  late final DeviceModel? currentIPhone = _resolveCurrentIPhone();
+
+  DeviceModel? _resolveCurrentIPhone() {
     final machineId = machineIdentifier;
     if (machineId == null || machineId.isEmpty) return null;
     if (!machineId.startsWith('iPhone')) return null;

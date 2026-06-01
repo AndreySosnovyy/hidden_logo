@@ -20,8 +20,13 @@ class DeviceInfoService {
     try {
       return await _channel.invokeMethod<String>('getMachineIdentifier');
     } on PlatformException {
+      // Drop the cached future so a later call can retry. A channel error is
+      // usually transient (e.g. the plugin not yet registered at early startup)
+      // unlike the deterministic non-iOS case above, which stays cached.
+      _future = null;
       return null;
     } on MissingPluginException {
+      _future = null;
       return null;
     }
   }

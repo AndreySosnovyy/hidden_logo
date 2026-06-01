@@ -6,5 +6,10 @@ class HLStub {
   HLStub._();
 
   /// Registers the stub plugin with Flutter's plugin system.
-  static void registerWith() {}
+  ///
+  /// Accepts an optional registrar so the same stub satisfies both the
+  /// Dart-only platform registration (called without arguments) and the web
+  /// plugin registrant (called with a `Registrar`). The argument is ignored
+  /// because the stub is a no-op on unsupported platforms.
+  static void registerWith([Object? registrar]) {}
 }

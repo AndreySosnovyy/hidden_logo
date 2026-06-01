@@ -1,8 +1,19 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hidden_logo/hidden_logo_stub.dart';
 import 'package:hidden_logo/src/parser.dart';
 
 void main() {
+  group('Stub registration', () {
+    test('registerWith is a no-op without arguments (dart-only platforms)', () {
+      expect(HLStub.registerWith, returnsNormally);
+    });
+
+    test('registerWith is a no-op with a registrar argument (web)', () {
+      expect(() => HLStub.registerWith(Object()), returnsNormally);
+    });
+  });
+
   group('Platform Detection Edge Cases', () {
     group('Non-iOS Platform Behavior', () {
       testWidgets('Should not display logo on Android platform', (
@@ -20,9 +31,10 @@ void main() {
         debugDefaultTargetPlatformOverride = null;
       });
 
-      testWidgets('Should not display logo on web platform', (tester) async {
-        debugDefaultTargetPlatformOverride =
-            TargetPlatform.linux; // Simulate web
+      testWidgets('Should not display logo on non-iOS mobile platform', (
+        tester,
+      ) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
 
         final parser = HiddenLogoParser(machineIdentifier: 'iPhone15,2');
 

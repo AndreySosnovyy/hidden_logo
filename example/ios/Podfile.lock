@@ -1,6 +1,6 @@
 PODS:
   - Flutter (1.0.0)
-  - hidden_logo (0.2.0):
+  - hidden_logo (1.2.0):
     - Flutter
 
 DEPENDENCIES:
@@ -15,8 +15,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  hidden_logo: cc7764d493aff3014d519b62a7e2a317ffe5715c
+  hidden_logo: 4e4d054cbc84365260be92dce2bcc02222cf8dc4
 
-PODFILE CHECKSUM: 4f1c12611da7338d21589c0b2ecd6bd20b109694
+PODFILE CHECKSUM: a57f30d18f102dd3ce366b1d62a55ecbef2158e5
 
 COCOAPODS: 1.16.2

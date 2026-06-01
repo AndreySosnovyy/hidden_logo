@@ -651,4 +651,79 @@ void main() {
       },
     );
   });
+
+  group('rebuild optimization', () {
+    testWidgets(
+      'does not rebuild the logo subtree on lifecycle changes in always mode',
+      (tester) async {
+        await setOrientation(Orientation.portrait);
+        DeviceInfoService.setMockMachineIdentifier(
+          getMachineIdentifier(logoType: LogoType.notch),
+        );
+        var notchBuildCount = 0;
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        await tester.pumpWidget(
+          MaterialApp(
+            home: const Scaffold(),
+            builder: (context, child) => HiddenLogoBase(
+              notchBuilder: (_, __) {
+                notchBuildCount++;
+                return const SizedBox.shrink();
+              },
+              dynamicIslandBuilder: (_, __) => const SizedBox.shrink(),
+              body: child!,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final initialCount = notchBuildCount;
+        expect(initialCount, greaterThan(0));
+
+        // In always mode the logo visibility does not depend on the lifecycle,
+        // so transitions must not trigger a rebuild of the subtree.
+        await goToBackground(tester, AppLifecycleState.paused);
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        );
+        await tester.pump();
+
+        expect(notchBuildCount, initialCount);
+
+        debugDefaultTargetPlatformOverride = null;
+      },
+    );
+
+    testWidgets(
+      'shows logo immediately when the app starts in the background '
+      'in onlyInBackground mode',
+      (tester) async {
+        await setOrientation(Orientation.portrait);
+        const notchKey = ValueKey('notch');
+        DeviceInfoService.setMockMachineIdentifier(
+          getMachineIdentifier(logoType: LogoType.notch),
+        );
+        // Simulate launching while not in the foreground. inactive does not
+        // disable frame scheduling, unlike paused/hidden/detached.
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.inactive,
+        );
+        await tester.pumpWidget(
+          const EmptyAppWithHiddenLogo(
+            notchKey: notchKey,
+            visibilityMode: LogoVisibilityMode.onlyInBackground,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // _isForeground is initialized from the real lifecycle state, so the
+        // logo must be visible without waiting for a lifecycle event.
+        expect(find.byKey(notchKey), findsOneWidget);
+
+        // Restore foreground state for subsequent tests.
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        );
+      },
+    );
+  });
 }

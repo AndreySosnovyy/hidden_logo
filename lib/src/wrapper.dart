@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:hidden_logo/src/base.dart';
 
 /// Logo builder function
-typedef LogoBuilder =
-    Widget Function(BuildContext context, BoxConstraints constraints);
+typedef LogoBuilder = Widget Function(
+  BuildContext context,
+  BoxConstraints constraints,
+);
 
 /// Determines when to show your logo
 enum LogoVisibilityMode {
@@ -15,9 +17,9 @@ enum LogoVisibilityMode {
 }
 
 /// {@template hidden_logo.HiddenLogo}
-/// Hidden Logo widget wrapper. It wraps body widget and displays
-/// widget built via provided functions on top of the screen where it it
-/// not visible under the physical hardware barrier.
+/// Hidden Logo widget wrapper. It wraps the body widget and displays a widget
+/// built via the provided functions at the top of the screen where it is not
+/// visible under the physical hardware barrier.
 /// {@endtemplate}
 class HiddenLogo extends StatelessWidget {
   /// {@macro hidden_logo.HiddenLogo}

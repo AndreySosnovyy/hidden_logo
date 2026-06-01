@@ -1,3 +1,14 @@
+## 1.2.0
+
+**BREAKING: minimum iOS deployment target raised to 13.0 and minimum Flutter SDK to 3.24.0**
+
+* Add Swift Package Manager support for iOS (closes #15)
+* Restructure iOS native files: moved from `ios/Classes/` to `ios/hidden_logo/Sources/hidden_logo/`
+* CocoaPods users: run `cd ios && pod install` after upgrading to refresh native source paths
+* Add web to the supported platforms (no-op stub, like other non-iOS platforms)
+* Avoid rebuilding the wrapped subtree on lifecycle changes unless the logo visibility actually changes
+* Retry the device identifier lookup if the platform channel fails at early startup instead of caching the failure
+
 ## 1.1.0
 
 * Add support for iPhone 17e
