@@ -183,11 +183,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: [minimum, stable]
+        sdk: [minimum, spm-minimum, stable]
         integration: [spm, cocoapods]
+        exclude:
+          # Flutter 3.24 stable does not expose its experimental SPM feature.
+          - sdk: minimum
+            integration: spm
+          - sdk: spm-minimum
+            integration: cocoapods
         include:
           - sdk: minimum
             flutter-version: '3.24.0'
+            runner: macos-15
+          - sdk: spm-minimum
+            flutter-version: '3.27.0'
             runner: macos-15
           - sdk: stable
             flutter-version: ''
@@ -209,7 +218,7 @@ jobs:
       - name: Select Xcode for the minimum SDK
         # Xcode 27 no longer accepts iOS 13 deployment targets. Keep the minimum
         # Flutter lane on a toolchain that can still build the library's floor.
-        if: matrix.sdk == 'minimum'
+        if: matrix.sdk != 'stable'
         run: sudo xcode-select --switch /Applications/Xcode_16.4.app/Contents/Developer
 
       - name: Initialize isolated Flutter configuration

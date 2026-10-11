@@ -80,9 +80,13 @@ class RepositoryCheck:
         self.require(ios == spm_ios == documented_ios and ios is not None,
                      "README.md / CocoaPods / SwiftPM: iOS deployment minimum must agree")
         workflow = self.read(".github/workflows/main.yml")
+        spm_flutter = self.declaration(
+            readme, r"^- Swift Package Manager: Flutter ≥([0-9.]+) on the stable channel;",
+            "README.md", "Swift Package Manager Flutter minimum")
         pinned_sdks = re.findall(r"flutter-version:\s*'([0-9.]+)'", workflow)
-        self.require(bool(pinned_sdks) and all(v == flutter for v in pinned_sdks),
-                     ".github/workflows/main.yml: pinned minimum lanes must match Flutter floor")
+        self.require(flutter is not None and spm_flutter is not None and
+                     set(pinned_sdks) == {flutter, spm_flutter},
+                     ".github/workflows/main.yml: pinned lanes must match Flutter and stable SPM floors")
         license_file = self.declaration(pod, r":file\s*=>\s*'([^']+)'",
                                         "ios/hidden_logo.podspec", "license file")
         self.require(license_file is not None and

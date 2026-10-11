@@ -22,7 +22,8 @@
 * Restore empty macOS and Linux example scaffold files
 * Update web example initialization and include the Cupertino icon font
 * Explicitly leave iPhone Duo without a logo and document the compatibility limit
-* Verify Swift Package Manager compatibility across minimum and current Flutter SDKs
+* Verify Swift Package Manager on Flutter 3.27.0 and current stable; document
+  that the overall Flutter 3.24.0 minimum uses CocoaPods on stable
 
 ## 1.2.0
 

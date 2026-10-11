@@ -33,7 +33,8 @@ on when iOS captures the app.
 
 - Flutter ≥3.24.0
 - iOS ≥13.0
-- Swift Package Manager and CocoaPods integrations are supported; choose the
+- CocoaPods integration is supported from Flutter 3.24.0
+- Swift Package Manager: Flutter ≥3.27.0 on the stable channel; choose the
   integration through your Flutter toolchain settings
 
 ## Usage
@@ -214,7 +215,8 @@ native resource references. The README app-builder example is compiled and run
 on both SDKs with stand-ins for the two user-supplied brand widgets, checking the
 public API and app wiring. CI is configured to build the Android, Web, iOS,
 Linux, Windows and macOS examples with the minimum and current stable Flutter
-SDKs. Formatting is checked with Flutter 3.24.0
+SDKs. The minimum stable Swift Package Manager lane uses Flutter 3.27.0;
+Flutter 3.24.0 stable is checked with CocoaPods. Formatting is checked with Flutter 3.24.0
 because Dart formatter output changes between SDK releases. See the
 [example instructions](example/README.md) for local builds and visual checks.
 

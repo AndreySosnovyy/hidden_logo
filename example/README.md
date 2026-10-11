@@ -23,6 +23,9 @@ has a 4 GB maximum heap to handle current Flutter build artifacts.
 
 For iOS, install Xcode and its simulator runtime and complete Apple's setup first.
 Flutter supports Swift Package Manager and CocoaPods integration for this plugin.
+Use Flutter 3.27.0 or later on stable for Swift Package Manager; Flutter 3.24.0
+stable uses CocoaPods. Earlier experimental SPM builds on other channels do not
+establish support on Flutter 3.24 stable.
 The plugin supports iOS 13 or later; the required deployment target of the example
 also depends on your Flutter and Xcode versions. Newer Xcode versions can require
 a higher example deployment target without changing the plugin's declared minimum.
