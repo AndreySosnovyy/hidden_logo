@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'hidden_logo'
-  s.version          = '1.3.1'
+  s.version          = '1.3.2'
   s.summary          = 'Flutter plugin to display hidden logo behind hardware barriers for iPhones'
   s.description      = <<-DESC
 A Flutter plugin that allows you to add widgets under the Notch or Dynamic Island
