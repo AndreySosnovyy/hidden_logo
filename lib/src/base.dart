@@ -1,5 +1,7 @@
 // ignore_for_file: public_member_api_docs
 
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:hidden_logo/src/device_info_service.dart';
 import 'package:hidden_logo/src/parser.dart';
@@ -28,7 +30,10 @@ class HiddenLogoBase extends StatefulWidget {
 class _HiddenLogoBaseState extends State<HiddenLogoBase>
     with WidgetsBindingObserver {
   late bool _isForeground;
-  late final Future<String?> _machineIdFuture;
+  Timer? _retryTimer;
+  bool _lookupInFlight = false;
+  bool _needsRetry = false;
+  int _lookupAttempts = 0;
   HiddenLogoParser? _parser;
 
   @override
@@ -38,7 +43,31 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
     final lifecycleState = WidgetsBinding.instance.lifecycleState;
     _isForeground =
         lifecycleState == null || lifecycleState == AppLifecycleState.resumed;
-    _machineIdFuture = DeviceInfoService.getMachineIdentifier();
+    _lookupMachineIdentifier();
+  }
+
+  Future<void> _lookupMachineIdentifier() async {
+    if (_lookupInFlight) return;
+    _lookupInFlight = true;
+    _lookupAttempts++;
+    final result = await DeviceInfoService.getMachineIdentifierResult();
+    if (!mounted) return;
+    _lookupInFlight = false;
+    _needsRetry = result.isTransientFailure;
+    if (_needsRetry) {
+      // Retry early registration failures twice, then wait for a resume event.
+      // Unsupported platforms and successful null results never start a timer.
+      if (_lookupAttempts < 3) {
+        _retryTimer = Timer(
+          Duration(milliseconds: 200 * _lookupAttempts),
+          _lookupMachineIdentifier,
+        );
+      }
+      return;
+    }
+    setState(() {
+      _parser = HiddenLogoParser(machineIdentifier: result.identifier);
+    });
   }
 
   @override
@@ -54,6 +83,11 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
         _isForeground = false;
     }
     super.didChangeAppLifecycleState(state);
+    if (_isForeground && !wasForeground && _needsRetry) {
+      _retryTimer?.cancel();
+      _lookupAttempts = 0;
+      _lookupMachineIdentifier();
+    }
     // The logo's visibility depends on foreground state only in
     // onlyInBackground mode. Avoid rebuilding the whole subtree otherwise.
     if (_isForeground != wasForeground &&
@@ -90,48 +124,62 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
   Widget build(BuildContext context) {
     return OrientationBuilder(
       builder: (context, orientation) {
-        if (orientation == Orientation.landscape) return widget.body;
-        return FutureBuilder<String?>(
-          future: _machineIdFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState != ConnectionState.done) {
-              return widget.body;
-            }
-            _parser ??= HiddenLogoParser(machineIdentifier: snapshot.data);
-            final parser = _parser!;
-            final logoScale = _logoScale(context, parser);
-            final constraints = parser.logoConstraints * logoScale;
-            return Stack(
-              children: [
-                widget.body,
-                if (parser.isTargetDevice &&
-                    widget.isVisible &&
-                    (widget.visibilityMode == LogoVisibilityMode.always ||
-                        !_isForeground) &&
-                    constraints.maxHeight > 0 &&
-                    constraints.maxWidth > 0)
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        top: parser.dynamicIslandTopMargin * logoScale,
+        final parser = _parser;
+        final showLogo = orientation == Orientation.portrait &&
+            parser != null &&
+            parser.isTargetDevice &&
+            widget.isVisible &&
+            (widget.visibilityMode == LogoVisibilityMode.always ||
+                !_isForeground);
+        Widget? overlay;
+        if (showLogo) {
+          final logoScale = _logoScale(context, parser);
+          final constraints = parser.logoConstraints * logoScale;
+          if (constraints.maxHeight > 0 && constraints.maxWidth > 0) {
+            final isNotch = parser.iPhonesLogoType == LogoType.notch;
+            final logo = isNotch
+                ? widget.notchBuilder(context, constraints)
+                : widget.dynamicIslandBuilder(context, constraints);
+            overlay = Positioned(
+              top: parser.dynamicIslandTopMargin * logoScale,
+              left: 0,
+              right: 0,
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ExcludeFocus(
+                  child: IgnorePointer(
+                    child: ExcludeSemantics(
+                      child: ConstrainedBox(
+                        constraints: constraints,
+                        child: isNotch
+                            ? ClipRect(child: logo)
+                            : ClipRRect(
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(100.0),
+                                ),
+                                // The hardware mask has a fixed shape even when
+                                // a builder returns a smaller widget. Center that
+                                // widget inside the full capsule before clipping.
+                                child: SizedBox(
+                                  width: constraints.maxWidth,
+                                  height: constraints.maxHeight,
+                                  child: Center(child: logo),
+                                ),
+                              ),
                       ),
-                      child: parser.iPhonesLogoType == LogoType.notch
-                          ? widget.notchBuilder(context, constraints)
-                          : ClipRRect(
-                              borderRadius: const BorderRadius.all(
-                                Radius.circular(100.0),
-                              ),
-                              child: widget.dynamicIslandBuilder(
-                                context,
-                                constraints,
-                              ),
-                            ),
                     ),
                   ),
-              ],
+                ),
+              ),
             );
-          },
+          }
+        }
+        // Keep the body in the same element slot while lookup, orientation,
+        // and visibility change. A positioned overlay cannot size the body.
+        return Stack(
+          alignment: Alignment.topLeft,
+          fit: StackFit.passthrough,
+          children: [widget.body, if (overlay != null) overlay],
         );
       },
     );
@@ -139,6 +187,7 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
 
   @override
   void dispose() {
+    _retryTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

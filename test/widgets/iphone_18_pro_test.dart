@@ -11,9 +11,9 @@ void main() {
   });
 
   for (final fixture in [
-    ('iPhone19,2', const Size(402, 874), const Offset(153.5, 14.3)),
-    ('iPhone19,3', const Size(440, 956), const Offset(172.5, 14.3)),
-    ('iPhone19,7', const Size(440, 956), const Offset(172.5, 14.3)),
+    ('iPhone19,2', const Size(402, 874), const Offset(154.5, 15.3)),
+    ('iPhone19,3', const Size(440, 956), const Offset(173.5, 15.3)),
+    ('iPhone19,7', const Size(440, 956), const Offset(173.5, 15.3)),
   ]) {
     final identifier = fixture.$1;
     testWidgets('$identifier renders a capsule behind the Dynamic Island',
@@ -40,7 +40,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(logoKey), findsOneWidget);
-      expect(tester.getSize(find.byKey(logoKey)), const Size(95, 36));
+      expect(tester.getSize(find.byKey(logoKey)), const Size(93, 34));
       expect(tester.getTopLeft(find.byKey(logoKey)), fixture.$3);
       expect(find.text('unexpected notch'), findsNothing);
       expect(

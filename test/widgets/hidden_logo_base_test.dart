@@ -511,9 +511,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Verify positioning with expected top margin (11.3 for iPhone 14 Pro)
+      // Verify positioning with expected top margin (12.3 for iPhone 14 Pro)
       final parser = HiddenLogoParser(machineIdentifier: 'iPhone15,2');
-      expect(parser.dynamicIslandTopMargin, equals(11.3));
+      expect(parser.dynamicIslandTopMargin, equals(12.3));
     });
 
     testWidgets('Dynamic Island constraints should be smaller than notch', (

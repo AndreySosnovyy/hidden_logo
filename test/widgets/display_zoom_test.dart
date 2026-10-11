@@ -36,32 +36,74 @@ void main() {
 
   for (final fixture in [
     (
+      'iPhone19,2',
+      const Size(1206, 2622),
+      const Size(1206, 2622),
+      const Size(93, 34),
+      15.3
+    ),
+    (
+      'iPhone19,2',
+      const Size(960, 2079),
+      const Size(1206, 2622),
+      const Size(74.029850746269, 27.064676616915),
+      12.179104477612
+    ),
+    (
+      'iPhone19,3',
+      const Size(1320, 2868),
+      const Size(1320, 2868),
+      const Size(93, 34),
+      15.3
+    ),
+    (
+      'iPhone19,3',
+      const Size(1125, 2436),
+      const Size(1320, 2868),
+      const Size(79.261363636364, 28.977272727273),
+      13.039772727273
+    ),
+    (
+      'iPhone19,7',
+      const Size(1320, 2868),
+      const Size(1320, 2868),
+      const Size(93, 34),
+      15.3
+    ),
+    (
+      'iPhone19,7',
+      const Size(1125, 2436),
+      const Size(1320, 2868),
+      const Size(79.261363636364, 28.977272727273),
+      13.039772727273
+    ),
+    (
       'iPhone18,1',
       const Size(1206, 2622),
       const Size(1206, 2622),
-      const Size(122, 36.7),
-      14.0
+      const Size(120, 34.7),
+      15.0
     ),
     (
       'iPhone18,1',
       const Size(1125, 2436),
       const Size(1206, 2622),
-      const Size(113.8059701493, 34.2350746269),
-      13.0597014925
+      const Size(111.940298507463, 32.369402985075),
+      13.992537313433
     ),
     (
       'iPhone18,1',
       const Size(960, 2079),
       const Size(1206, 2622),
-      const Size(97.1144278607, 29.2139303483),
-      11.1442786070
+      const Size(95.522388059701, 27.621890547264),
+      11.940298507463
     ),
     (
       'iPhone15,2',
       const Size(1125, 2436),
       const Size(1179, 2556),
-      const Size(116.4122137405, 35.0190839695),
-      10.7824427481
+      const Size(114.503816793893, 33.110687022901),
+      11.736641221374
     ),
     (
       'iPhone14,5',
@@ -74,21 +116,21 @@ void main() {
       'iPhone18,1',
       const Size(1206, 2622),
       Size.zero,
-      const Size(122, 36.7),
-      14.0
+      const Size(120, 34.7),
+      15.0
     ),
     (
       'iPhone13,1',
       const Size(1125, 2436),
       const Size(1080, 2340),
-      const Size(226, 34.7),
+      const Size(226, 33.3),
       0.0,
     ),
     (
       'iPhone13,1',
       const Size(960, 2079),
       const Size(1080, 2340),
-      const Size(192.8533333333, 29.6106666667),
+      const Size(192.8533333333, 28.416),
       0.0,
     ),
     (
@@ -145,8 +187,8 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(tester.getSize(find.byKey(logoKey)), const Size(122, 36.7));
-    expect(tester.getTopLeft(find.byKey(logoKey)).dy, 14);
+    expect(tester.getSize(find.byKey(logoKey)), const Size(120, 34.7));
+    expect(tester.getTopLeft(find.byKey(logoKey)).dy, 15);
     await tester.pumpWidget(const SizedBox.shrink());
     debugDefaultTargetPlatformOverride = null;
   });
@@ -159,17 +201,17 @@ void main() {
     addTearDown(tester.view.reset);
     addTearDown(tester.view.display.reset);
     await pumpLogo(tester, 'iPhone18,1');
-    expect(tester.getSize(find.byKey(logoKey)), const Size(122, 36.7));
+    expect(tester.getSize(find.byKey(logoKey)), const Size(120, 34.7));
 
     tester.view.physicalSize = const Size(1125, 2436);
     await tester.pumpAndSettle();
     expect(
       tester.getSize(find.byKey(logoKey)).width,
-      closeTo(113.8059701493, 0.0001),
+      closeTo(111.940298507463, 0.0001),
     );
     expect(
       tester.getTopLeft(find.byKey(logoKey)).dy,
-      closeTo(13.0597014925, 0.0001),
+      closeTo(13.992537313433, 0.0001),
     );
 
     tester.view.physicalSize = const Size(2436, 1125);
@@ -177,7 +219,7 @@ void main() {
     expect(find.byKey(logoKey), findsNothing);
     tester.view.physicalSize = const Size(1206, 2622);
     await tester.pumpAndSettle();
-    expect(tester.getSize(find.byKey(logoKey)), const Size(122, 36.7));
+    expect(tester.getSize(find.byKey(logoKey)), const Size(120, 34.7));
     await tester.pumpWidget(const SizedBox.shrink());
     debugDefaultTargetPlatformOverride = null;
   });

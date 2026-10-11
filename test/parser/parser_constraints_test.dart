@@ -36,36 +36,36 @@ void main() {
     const bc330x2300 = BoxConstraints(maxHeight: 33.0, maxWidth: 230.0);
     testConstraintsParsing(DeviceModel.iPhoneXr, bc330x2300);
     testConstraintsParsing(DeviceModel.iPhone11, bc330x2300);
-    const bc322x2110 = BoxConstraints(maxHeight: 32.2, maxWidth: 211.0);
-    testConstraintsParsing(DeviceModel.iPhone12, bc322x2110);
-    testConstraintsParsing(DeviceModel.iPhone12Pro, bc322x2110);
-    testConstraintsParsing(DeviceModel.iPhone12ProMax, bc322x2110);
-    const bc347x2260 = BoxConstraints(maxHeight: 34.7, maxWidth: 226.0);
-    testConstraintsParsing(DeviceModel.iPhone12Mini, bc347x2260);
+    const bc310x2110 = BoxConstraints(maxHeight: 31.0, maxWidth: 211.0);
+    testConstraintsParsing(DeviceModel.iPhone12, bc310x2110);
+    testConstraintsParsing(DeviceModel.iPhone12Pro, bc310x2110);
+    testConstraintsParsing(DeviceModel.iPhone12ProMax, bc310x2110);
+    const bc333x2260 = BoxConstraints(maxHeight: 33.3, maxWidth: 226.0);
+    testConstraintsParsing(DeviceModel.iPhone12Mini, bc333x2260);
     const bc347x1750 = BoxConstraints(maxHeight: 37.4, maxWidth: 175.0);
     testConstraintsParsing(DeviceModel.iPhone13Mini, bc347x1750);
-    const bc367x1220 = BoxConstraints(maxHeight: 36.7, maxWidth: 122.0);
-    testConstraintsParsing(DeviceModel.iPhone14Pro, bc367x1220);
-    testConstraintsParsing(DeviceModel.iPhone14ProMax, bc367x1220);
-    testConstraintsParsing(DeviceModel.iPhone15, bc367x1220);
-    testConstraintsParsing(DeviceModel.iPhone15Plus, bc367x1220);
-    testConstraintsParsing(DeviceModel.iPhone15Pro, bc367x1220);
-    testConstraintsParsing(DeviceModel.iPhone15ProMax, bc367x1220);
-    testConstraintsParsing(DeviceModel.iPhone16, bc367x1220);
-    testConstraintsParsing(DeviceModel.iPhone16Plus, bc367x1220);
-    testConstraintsParsing(DeviceModel.iPhone16Pro, bc367x1220);
-    testConstraintsParsing(DeviceModel.iPhone16ProMax, bc367x1220);
-    testConstraintsParsing(DeviceModel.iPhone17, bc367x1220);
-    testConstraintsParsing(DeviceModel.iPhoneAir, bc367x1220);
-    testConstraintsParsing(DeviceModel.iPhone17Pro, bc367x1220);
-    testConstraintsParsing(DeviceModel.iPhone17ProMax, bc367x1220);
+    const bc347x1200 = BoxConstraints(maxHeight: 34.7, maxWidth: 120.0);
+    testConstraintsParsing(DeviceModel.iPhone14Pro, bc347x1200);
+    testConstraintsParsing(DeviceModel.iPhone14ProMax, bc347x1200);
+    testConstraintsParsing(DeviceModel.iPhone15, bc347x1200);
+    testConstraintsParsing(DeviceModel.iPhone15Plus, bc347x1200);
+    testConstraintsParsing(DeviceModel.iPhone15Pro, bc347x1200);
+    testConstraintsParsing(DeviceModel.iPhone15ProMax, bc347x1200);
+    testConstraintsParsing(DeviceModel.iPhone16, bc347x1200);
+    testConstraintsParsing(DeviceModel.iPhone16Plus, bc347x1200);
+    testConstraintsParsing(DeviceModel.iPhone16Pro, bc347x1200);
+    testConstraintsParsing(DeviceModel.iPhone16ProMax, bc347x1200);
+    testConstraintsParsing(DeviceModel.iPhone17, bc347x1200);
+    testConstraintsParsing(DeviceModel.iPhoneAir, bc347x1200);
+    testConstraintsParsing(DeviceModel.iPhone17Pro, bc347x1200);
+    testConstraintsParsing(DeviceModel.iPhone17ProMax, bc347x1200);
     testConstraintsParsing(
       DeviceModel.iPhone18Pro,
-      const BoxConstraints(maxHeight: 36.0, maxWidth: 95.0),
+      const BoxConstraints(maxHeight: 34.0, maxWidth: 93.0),
     );
     testConstraintsParsing(
       DeviceModel.iPhone18ProMax,
-      const BoxConstraints(maxHeight: 36.0, maxWidth: 95.0),
+      const BoxConstraints(maxHeight: 34.0, maxWidth: 93.0),
     );
 
     test('Should return 0x0 BoxConstraints if unable to parse iPhone', () {
@@ -107,22 +107,22 @@ void main() {
     testTopMarginParsing(DeviceModel.iPhone14Plus, 0);
     testTopMarginParsing(DeviceModel.iPhone16e, 0);
     testTopMarginParsing(DeviceModel.iPhone17e, 0);
-    testTopMarginParsing(DeviceModel.iPhone14Pro, 11.3);
-    testTopMarginParsing(DeviceModel.iPhone14ProMax, 11.3);
-    testTopMarginParsing(DeviceModel.iPhone15, 11.3);
-    testTopMarginParsing(DeviceModel.iPhone15Pro, 11.3);
-    testTopMarginParsing(DeviceModel.iPhone15Plus, 11.3);
-    testTopMarginParsing(DeviceModel.iPhone15ProMax, 11.3);
-    testTopMarginParsing(DeviceModel.iPhone16, 11.3);
-    testTopMarginParsing(DeviceModel.iPhone16Plus, 11.3);
-    testTopMarginParsing(DeviceModel.iPhone16Pro, 14.0);
-    testTopMarginParsing(DeviceModel.iPhone16ProMax, 14.0);
-    testTopMarginParsing(DeviceModel.iPhone17, 14.0);
-    testTopMarginParsing(DeviceModel.iPhone17Pro, 14.0);
-    testTopMarginParsing(DeviceModel.iPhone17ProMax, 14.0);
-    testTopMarginParsing(DeviceModel.iPhone18Pro, 14.3);
-    testTopMarginParsing(DeviceModel.iPhone18ProMax, 14.3);
-    testTopMarginParsing(DeviceModel.iPhoneAir, 20.0);
+    testTopMarginParsing(DeviceModel.iPhone14Pro, 12.3);
+    testTopMarginParsing(DeviceModel.iPhone14ProMax, 12.3);
+    testTopMarginParsing(DeviceModel.iPhone15, 12.3);
+    testTopMarginParsing(DeviceModel.iPhone15Pro, 12.3);
+    testTopMarginParsing(DeviceModel.iPhone15Plus, 12.3);
+    testTopMarginParsing(DeviceModel.iPhone15ProMax, 12.3);
+    testTopMarginParsing(DeviceModel.iPhone16, 12.3);
+    testTopMarginParsing(DeviceModel.iPhone16Plus, 12.3);
+    testTopMarginParsing(DeviceModel.iPhone16Pro, 15.0);
+    testTopMarginParsing(DeviceModel.iPhone16ProMax, 15.0);
+    testTopMarginParsing(DeviceModel.iPhone17, 15.0);
+    testTopMarginParsing(DeviceModel.iPhone17Pro, 15.0);
+    testTopMarginParsing(DeviceModel.iPhone17ProMax, 15.0);
+    testTopMarginParsing(DeviceModel.iPhone18Pro, 15.3);
+    testTopMarginParsing(DeviceModel.iPhone18ProMax, 15.3);
+    testTopMarginParsing(DeviceModel.iPhoneAir, 21.0);
 
     test('Should return 0 top margin if unable to parse iPhone', () {
       final parser = HiddenLogoParser(machineIdentifier: null);

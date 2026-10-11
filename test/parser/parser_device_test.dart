@@ -75,6 +75,7 @@ void main() {
       });
     }
 
+    testCodeParsing('iPhone10,3', DeviceModel.iPhoneX);
     testCodeParsing('iPhone10,6', DeviceModel.iPhoneX);
     testCodeParsing('iPhone11,2', DeviceModel.iPhoneXs);
     testCodeParsing('iPhone11,4', DeviceModel.iPhoneXsMax);
