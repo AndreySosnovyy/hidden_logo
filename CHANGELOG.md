@@ -1,3 +1,30 @@
+## 1.3.0
+
+* Add documentation and manifest consistency checks, including native asset references
+* Correct the CocoaPods license declaration to match the existing BSD-3-Clause license
+* Compile and run the README usage example in CI; provide its missing app route
+* Add minimum/current SDK CI builds for Web, Linux, Windows and macOS examples
+* Clarify lifecycle-dependent capture behavior and document the example build workflow
+* Add support for iPhone 18 Pro and iPhone 18 Pro Max (StixHub, #17)
+* Inset the new Dynamic Island logo area by 1 pt after simulator mask verification
+* Inset older Dynamic Island presets by 1 pt to remove faint edge leakage; add
+  independently measured mask fixtures and pixel regressions for every supported model
+* Adapt logo constraints and Dynamic Island top padding to iOS Display Zoom (StixHub, #18)
+* Preserve app state and navigation when the identifier resolves or orientation changes
+* Enforce logo bounds and clipping; make the overlay decorative and noninteractive
+* Keep decorative logos out of keyboard focus and activation
+* Recover from transient platform channel failures with bounded retries
+* Add the missing iPhone X identifier iPhone10,3
+* Reduce iPhone 12/12 Pro/12 Pro Max and 12 mini logo height after notch mask verification
+* Update the Android example build tools and add minimum/current SDK build checks
+* Disable unnecessary Jetifier transforms and increase the Android example Gradle heap
+* Fix a signedness warning treated as an error in the Windows example
+* Restore empty macOS and Linux example scaffold files
+* Update web example initialization and include the Cupertino icon font
+* Explicitly leave iPhone Duo without a logo and document the compatibility limit
+* Verify Swift Package Manager on Flutter 3.27.0 and current stable; document
+  that the overall Flutter 3.24.0 minimum uses CocoaPods on stable
+
 ## 1.2.0
 
 **BREAKING: minimum iOS deployment target raised to 13.0 and minimum Flutter SDK to 3.24.0**

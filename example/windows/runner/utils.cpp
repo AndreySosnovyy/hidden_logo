@@ -51,7 +51,8 @@ std::string Utf8FromUtf16(const wchar_t* utf16_string) {
     -1; // remove the trailing null character
   int input_length = (int)wcslen(utf16_string);
   std::string utf8_string;
-  if (target_length <= 0 || target_length > utf8_string.max_size()) {
+  if (target_length <= 0 ||
+      static_cast<std::string::size_type>(target_length) > utf8_string.max_size()) {
     return utf8_string;
   }
   utf8_string.resize(target_length);

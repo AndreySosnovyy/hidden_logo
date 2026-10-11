@@ -75,6 +75,7 @@ void main() {
       });
     }
 
+    testCodeParsing('iPhone10,3', DeviceModel.iPhoneX);
     testCodeParsing('iPhone10,6', DeviceModel.iPhoneX);
     testCodeParsing('iPhone11,2', DeviceModel.iPhoneXs);
     testCodeParsing('iPhone11,4', DeviceModel.iPhoneXsMax);
@@ -109,6 +110,9 @@ void main() {
     testCodeParsing('iPhone18,3', DeviceModel.iPhone17);
     testCodeParsing('iPhone18,4', DeviceModel.iPhoneAir);
     testCodeParsing('iPhone18,5', DeviceModel.iPhone17e);
+    testCodeParsing('iPhone19,2', DeviceModel.iPhone18Pro);
+    testCodeParsing('iPhone19,3', DeviceModel.iPhone18ProMax);
+    testCodeParsing('iPhone19,7', DeviceModel.iPhone18ProMax);
   });
 
   group('Logo types for iPhones', () {
@@ -156,6 +160,8 @@ void main() {
     testLogoTypeParsing(DeviceModel.iPhoneAir, LogoType.dynamicIsland);
     testLogoTypeParsing(DeviceModel.iPhone17Pro, LogoType.dynamicIsland);
     testLogoTypeParsing(DeviceModel.iPhone17ProMax, LogoType.dynamicIsland);
+    testLogoTypeParsing(DeviceModel.iPhone18Pro, LogoType.dynamicIsland);
+    testLogoTypeParsing(DeviceModel.iPhone18ProMax, LogoType.dynamicIsland);
 
     test('Should throw assertion error when device is not supported', () {
       final parser = HiddenLogoParser(machineIdentifier: null);

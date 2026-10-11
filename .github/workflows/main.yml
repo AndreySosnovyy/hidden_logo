@@ -10,22 +10,44 @@ on:
 
 jobs:
   analyze-and-test:
+    name: Analyze and test (${{ matrix.sdk }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - sdk: minimum
+            flutter-version: '3.24.0'
+          - sdk: stable
+            flutter-version: ''
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Validate GitHub Actions workflow
+        if: matrix.sdk == 'minimum'
+        run: docker run --rm --volume "$PWD:/repo" --workdir /repo rhysd/actionlint:1.7.12 -color
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.24.0
+          flutter-version: ${{ matrix.flutter-version }}
           channel: 'stable'
 
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Verify documentation and manifests
+        run: python3 tool/check_repository.py
+
+      - name: Compile and run the README example
+        run: python3 tool/check_readme_example.py
+
       - name: Verify formatting
+        # Dart's formatter changes between SDK releases. The minimum supported
+        # SDK defines this repository's format; both SDKs still analyze and test.
+        if: matrix.sdk == 'minimum'
         run: dart format --output=none --set-exit-if-changed .
 
       - name: Analyze
@@ -37,8 +59,49 @@ jobs:
       - name: Validate package (dry run)
         run: flutter pub publish --dry-run
 
-  ios-build:
-    runs-on: macos-latest
+  android-build:
+    name: Android example (${{ matrix.sdk }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - sdk: minimum
+            flutter-version: '3.24.0'
+          - sdk: stable
+            flutter-version: ''
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ matrix.flutter-version }}
+          channel: 'stable'
+
+      - name: Build example
+        working-directory: example
+        run: flutter build apk --debug
+
+  web-build:
+    name: Web example (${{ matrix.sdk }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - sdk: minimum
+            flutter-version: '3.24.0'
+          - sdk: stable
+            flutter-version: ''
 
     steps:
       - name: Checkout code
@@ -47,20 +110,146 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.24.0
+          flutter-version: ${{ matrix.flutter-version }}
           channel: 'stable'
 
-      - name: Build example (Swift Package Manager)
+      - name: Build example
+        working-directory: example
+        run: flutter build web --release
+
+  desktop-build:
+    name: Desktop example (${{ matrix.platform }}, ${{ matrix.sdk }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux
+            sdk: minimum
+            flutter-version: '3.24.0'
+            runner: ubuntu-latest
+          - platform: linux
+            sdk: stable
+            flutter-version: ''
+            runner: ubuntu-latest
+          - platform: windows
+            sdk: minimum
+            flutter-version: '3.24.0'
+            # Flutter 3.24 recognizes VS 2022, but cannot select VS 2026.
+            runner: windows-2022
+          - platform: windows
+            sdk: stable
+            flutter-version: ''
+            runner: windows-latest
+          - platform: macos
+            sdk: minimum
+            flutter-version: '3.24.0'
+            runner: macos-15
+          - platform: macos
+            sdk: stable
+            flutter-version: ''
+            runner: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Select Xcode for the minimum macOS SDK
+        if: matrix.platform == 'macos' && matrix.sdk == 'minimum'
+        run: sudo xcode-select --switch /Applications/Xcode_16.4.app/Contents/Developer
+
+      - name: Install Linux build dependencies
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libstdc++-12-dev
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ matrix.flutter-version }}
+          channel: 'stable'
+
+      - name: Enable desktop target
+        run: flutter config --enable-${{ matrix.platform }}-desktop
+
+      - name: Build example
+        working-directory: example
+        run: flutter build ${{ matrix.platform }} --release
+
+  ios-build:
+    name: iOS (${{ matrix.sdk }}, ${{ matrix.integration }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk: [minimum, spm-minimum, stable]
+        integration: [spm, cocoapods]
+        exclude:
+          # Flutter 3.24 stable does not expose its experimental SPM feature.
+          - sdk: minimum
+            integration: spm
+          - sdk: spm-minimum
+            integration: cocoapods
+        include:
+          - sdk: minimum
+            flutter-version: '3.24.0'
+            runner: macos-15
+          - sdk: spm-minimum
+            flutter-version: '3.27.0'
+            runner: macos-15
+          - sdk: stable
+            flutter-version: ''
+            runner: macos-latest
+          - integration: spm
+            use-spm: 'true'
+          - integration: cocoapods
+            use-spm: 'false'
+    env:
+      # Keep integration settings local to each clean matrix checkout. Flutter
+      # 3.24 uses SWIFT_PACKAGE_MANAGER; newer SDKs use the prefixed name.
+      SWIFT_PACKAGE_MANAGER: ${{ matrix.use-spm }}
+      FLUTTER_SWIFT_PACKAGE_MANAGER: ${{ matrix.use-spm }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Select Xcode for the minimum SDK
+        # Xcode 27 no longer accepts iOS 13 deployment targets. Keep the minimum
+        # Flutter lane on a toolchain that can still build the library's floor.
+        if: matrix.sdk != 'stable'
+        run: sudo xcode-select --switch /Applications/Xcode_16.4.app/Contents/Developer
+
+      - name: Initialize isolated Flutter configuration
+        run: |
+          mkdir -p "$RUNNER_TEMP/flutter-config"
+          echo "XDG_CONFIG_HOME=$RUNNER_TEMP/flutter-config" >> "$GITHUB_ENV"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ matrix.flutter-version }}
+          channel: 'stable'
+
+      - name: Build example
         working-directory: example
         run: |
-          flutter config --enable-swift-package-manager
           flutter pub get
           flutter build ios --release --no-codesign
 
-      - name: Build example (CocoaPods)
+      - name: Verify selected integration
         working-directory: example
         run: |
-          flutter config --no-enable-swift-package-manager
-          flutter clean
-          flutter pub get
-          flutter build ios --release --no-codesign
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          metadata = json.loads(Path('.flutter-plugins-dependencies').read_text())
+          enabled = metadata['swift_package_manager_enabled']
+          if isinstance(enabled, dict):
+              enabled = enabled['ios']
+          expected = os.environ['FLUTTER_SWIFT_PACKAGE_MANAGER'] == 'true'
+          assert enabled == expected, f'Expected SPM={expected}, got {enabled}'
+          PY

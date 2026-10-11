@@ -48,3 +48,6 @@ build/
 node_modules/
 package.json
 package-lock.json
+
+# Local review evidence and publication drafts
+/output/release-preparation/

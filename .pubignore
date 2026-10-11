@@ -7,6 +7,8 @@ package-lock.json
 build/
 .dart_tool/
 coverage/
+*.pyc
+**/__pycache__/
 
 # Pub / Flutter dev artefacts
 pubspec.lock
@@ -15,6 +17,9 @@ pubspec.lock
 .packages
 **/doc/api/
 *.log
+
+# Local review artifacts and publication drafts
+output/release-preparation/
 
 # OS / misc
 .DS_Store

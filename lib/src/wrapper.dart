@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hidden_logo/src/base.dart';
 
-/// Logo builder function
+/// Builds a decorative logo within the supplied maximum bounds.
+///
+/// The overlay clips overflow and excludes pointer events, keyboard focus,
+/// and semantics.
 typedef LogoBuilder = Widget Function(
   BuildContext context,
   BoxConstraints constraints,
@@ -12,7 +15,7 @@ enum LogoVisibilityMode {
   /// Always show the logo
   always,
 
-  /// Show the logo only when application is paused, inactive or hidden
+  /// Show while the app is inactive, paused, hidden or detached.
   onlyInBackground,
 }
 
@@ -32,7 +35,9 @@ class HiddenLogo extends StatelessWidget {
     super.key,
   });
 
-  /// Your widget to be wrapped (usually MaterialApp or CupertinoApp)
+  /// Full-screen app content.
+  ///
+  /// Use the app builder when logos need inherited theme or localization.
   final Widget body;
 
   /// What would you like to see behind iPhone's notch

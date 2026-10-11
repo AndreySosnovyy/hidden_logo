@@ -10,8 +10,8 @@ import 'package:flutter/widgets.dart';
 /// screenshots or when the app is minimized.
 /// {@endtemplate}
 enum LogoType {
-  /// Hardware barrier found on most iPhones from iPhone X onward, except the
-  /// models that use the Dynamic Island. The iPhone 16e and 17e use a notch
+  /// Hardware barrier found on the supported notch models, starting with iPhone X.
+  /// The iPhone 16e and 17e use a notch
   /// despite being newer than the first Dynamic Island devices.
   ///
   /// The notch is a black cutout at the top center of the screen that
@@ -20,8 +20,8 @@ enum LogoType {
   /// and when the app is minimized.
   notch,
 
-  /// Hardware barrier found on iPhone 14 Pro/Pro Max and all iPhone 15 and
-  /// later models, except the iPhone 16e and 17e which use a notch.
+  /// Hardware barrier found on the supported Dynamic Island models, starting
+  /// with iPhone 14 Pro/Pro Max. See [DeviceModel] for the supported devices.
   ///
   /// The Dynamic Island is a pill-shaped interactive area at the top
   /// center of the screen. It's smaller than the notch and has rounded
@@ -33,14 +33,15 @@ enum LogoType {
 /// {@template hidden_logo.DeviceModel}
 /// Enumeration of all iPhone models supported by the hidden_logo package.
 ///
-/// This enum contains all iPhone models from iPhone X onwards that have
-/// either a notch or Dynamic Island hardware barrier where logos can be
-/// positioned. Each model has specific size constraints and positioning
+/// This enum lists the explicitly supported iPhone models with a notch or
+/// Dynamic Island hardware barrier where logos can be positioned. Unsupported
+/// models, including iPhone Duo, are not enabled automatically. Each model has
+/// specific size constraints and positioning
 /// requirements for optimal logo placement.
 ///
 /// The supported models are categorized into two groups:
-/// - **Dynamic Island devices**: iPhone 14 Pro/Pro Max and iPhone 15 and later,
-///   except the iPhone 16e and 17e
+/// - **Dynamic Island devices**: the supported models starting with iPhone
+///   14 Pro/Pro Max, excluding the notch models iPhone 16e and 17e
 /// - **Notch devices**: all other supported models
 ///
 /// See [LogoType] for the hardware barrier types.
@@ -144,6 +145,12 @@ enum DeviceModel {
 
   /// iPhone 17e
   iPhone17e,
+
+  /// iPhone 18 Pro
+  iPhone18Pro,
+
+  /// iPhone 18 Pro Max
+  iPhone18ProMax,
 }
 
 /// {@template hidden_logo.HiddenLogoParser}
@@ -155,6 +162,7 @@ class HiddenLogoParser {
   /// Keys are the numeric part after "iPhone" prefix (e.g., "15,2" for iPhone 14 Pro).
   static const Map<String, DeviceModel> _iPhoneMachineIdentifiersMap = {
     '10,6': DeviceModel.iPhoneX,
+    '10,3': DeviceModel.iPhoneX,
     '11,2': DeviceModel.iPhoneXs,
     '11,4': DeviceModel.iPhoneXsMax,
     '11,6': DeviceModel.iPhoneXsMax,
@@ -188,6 +196,9 @@ class HiddenLogoParser {
     '18,3': DeviceModel.iPhone17,
     '18,4': DeviceModel.iPhoneAir,
     '18,5': DeviceModel.iPhone17e,
+    '19,2': DeviceModel.iPhone18Pro,
+    '19,3': DeviceModel.iPhone18ProMax,
+    '19,7': DeviceModel.iPhone18ProMax,
   };
 
   /// Returns the machine identifier suffix for a given iPhone model.
@@ -251,9 +262,9 @@ class HiddenLogoParser {
 
   /// The hardware barrier type for the current iPhone.
   ///
-  /// Returns [LogoType.dynamicIsland] for iPhone 14 Pro/Pro Max and iPhone 15
-  /// and later (except the iPhone 16e and 17e), and [LogoType.notch] for all
-  /// other supported models.
+  /// Returns [LogoType.dynamicIsland] for the explicitly supported Dynamic Island
+  /// models and [LogoType.notch] for the explicitly supported notch models.
+  /// New or unknown iPhone identifiers are not inferred from their generation.
   ///
   /// **Important**: This getter assumes the device is a target iPhone. It will
   /// throw an assertion error if called on a non-target device. Always check
@@ -285,6 +296,8 @@ class HiddenLogoParser {
       case DeviceModel.iPhoneAir:
       case DeviceModel.iPhone17Pro:
       case DeviceModel.iPhone17ProMax:
+      case DeviceModel.iPhone18Pro:
+      case DeviceModel.iPhone18ProMax:
         return LogoType.dynamicIsland;
       case DeviceModel.iPhoneX:
       case DeviceModel.iPhoneXr:
@@ -363,16 +376,19 @@ class HiddenLogoParser {
 
   /// The size constraints for logo placement on the current iPhone.
   ///
-  /// Returns precise [BoxConstraints] that define the maximum dimensions
-  /// available for logo rendering behind the hardware barrier. These constraints
-  /// are carefully measured for each iPhone model to ensure logos fit perfectly
-  /// within the available space.
+  /// Returns [BoxConstraints] that define the maximum dimensions for logo
+  /// rendering behind the hardware barrier on supported models. Dynamic Island
+  /// logos are clipped to a capsule; notch logos need suitable rounded corners
+  /// supplied by their builder. These are standard-layout values; the widget
+  /// scales them when Display Zoom reduces the view rendering size.
   ///
   /// Different iPhone models have different constraint values:
   /// - **iPhone X series**: 30.0×209.0 or 33.0×230.0 depending on model
-  /// - **iPhone 12 series**: 32.2×211.0 to 37.4×175.0 depending on model
-  /// - **iPhone 13-16 series**: 33.0×162.0 for standard models
-  /// - **Dynamic Island models**: 36.7×122.0 for all Dynamic Island devices
+  /// - **iPhone 12 series**: 31.0×211.0, or 33.3×226.0 for the mini
+  /// - **iPhone 13/13 Pro/13 Pro Max, 14/14 Plus, 16e/17e**: 33.0×162.0
+  /// - **iPhone 13 mini**: 37.4×175.0
+  /// - **Dynamic Island models through iPhone 17**: 34.7×120.0
+  /// - **iPhone 18 Pro/Pro Max**: 34.0×93.0
   ///
   /// Returns zero constraints (0×0) for unsupported devices, which should
   /// be validated before use.
@@ -380,8 +396,8 @@ class HiddenLogoParser {
   /// Example:
   /// ```dart
   /// final constraints = parser.logoConstraints;
-  /// final maxWidth = constraints.maxWidth;  // e.g., 122.0 for iPhone 15 Pro
-  /// final maxHeight = constraints.maxHeight; // e.g., 36.7 for iPhone 15 Pro
+  /// final maxWidth = constraints.maxWidth;  // e.g., 120.0 for iPhone 15 Pro
+  /// final maxHeight = constraints.maxHeight; // e.g., 34.7 for iPhone 15 Pro
   /// ```
   BoxConstraints get logoConstraints {
     switch (currentIPhone) {
@@ -408,10 +424,12 @@ class HiddenLogoParser {
       case DeviceModel.iPhone12:
       case DeviceModel.iPhone12Pro:
       case DeviceModel.iPhone12ProMax:
-        return const BoxConstraints(maxHeight: 32.2, maxWidth: 211.0);
+        // Inset the flat bottom of the approximately 32-point notch by 1 point.
+        return const BoxConstraints(maxHeight: 31.0, maxWidth: 211.0);
 
       case DeviceModel.iPhone12Mini:
-        return const BoxConstraints(maxHeight: 34.7, maxWidth: 226.0);
+        // The standard render mask ends at approximately 34.35 logical points.
+        return const BoxConstraints(maxHeight: 33.3, maxWidth: 226.0);
 
       case DeviceModel.iPhone13Mini:
         return const BoxConstraints(maxHeight: 37.4, maxWidth: 175.0);
@@ -430,7 +448,13 @@ class HiddenLogoParser {
       case DeviceModel.iPhone16ProMax:
       case DeviceModel.iPhone17Pro:
       case DeviceModel.iPhone17ProMax:
-        return const BoxConstraints(maxHeight: 36.7, maxWidth: 122.0);
+        // Inset the runtime capsule by 1 point to avoid tinted edge pixels.
+        return const BoxConstraints(maxHeight: 34.7, maxWidth: 120.0);
+      case DeviceModel.iPhone18Pro:
+      case DeviceModel.iPhone18ProMax:
+        // Keep a 1-point inset from the proposed 95x36 logo area so saturated
+        // logos cannot leak through its antialiased edge on iOS 27 simulators.
+        return const BoxConstraints(maxHeight: 34.0, maxWidth: 93.0);
       case null:
         return const BoxConstraints(maxHeight: 0, maxWidth: 0);
     }
@@ -443,9 +467,10 @@ class HiddenLogoParser {
   /// alignment with the Dynamic Island hardware barrier.
   ///
   /// Margin values by device generation:
-  /// - **iPhone 14 Pro/15 series**: 11.3 pixels
-  /// - **iPhone 16 Pro/17 series**: 14.0 pixels
-  /// - **iPhone Air**: 20.0 pixels
+  /// - **iPhone 14 Pro/Pro Max, 15 series, 16/16 Plus**: 12.3 logical pixels
+  /// - **iPhone 16 Pro/Pro Max, 17/17 Pro/17 Pro Max**: 15.0 logical pixels
+  /// - **iPhone 18 Pro/Pro Max**: 15.3 logical pixels
+  /// - **iPhone Air**: 21.0 logical pixels
   /// - **All notch devices**: 0.0 pixels (no margin needed)
   ///
   /// The margin accounts for differences in Dynamic Island positioning
@@ -466,15 +491,18 @@ class HiddenLogoParser {
       case DeviceModel.iPhone15ProMax:
       case DeviceModel.iPhone16:
       case DeviceModel.iPhone16Plus:
-        return 11.3;
+        return 12.3;
       case DeviceModel.iPhone16Pro:
       case DeviceModel.iPhone16ProMax:
       case DeviceModel.iPhone17:
       case DeviceModel.iPhone17Pro:
       case DeviceModel.iPhone17ProMax:
-        return 14.0;
+        return 15.0;
+      case DeviceModel.iPhone18Pro:
+      case DeviceModel.iPhone18ProMax:
+        return 15.3;
       case DeviceModel.iPhoneAir:
-        return 20.0;
+        return 21.0;
       case DeviceModel.iPhoneX:
       case DeviceModel.iPhoneXr:
       case DeviceModel.iPhoneXs:
