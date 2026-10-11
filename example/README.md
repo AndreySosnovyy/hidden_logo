@@ -63,6 +63,8 @@ version with Xcode 16.4 instead. These overrides are not package requirements.
 
 Linux and Windows desktop builds require the corresponding host platform and
 Flutter desktop toolchain. All non-iOS builds intentionally show only the app body.
+The minimum Flutter Windows CI lane uses Windows 2022 with Visual Studio 2022:
+Flutter 3.24 cannot select the Visual Studio 2026 generator on newer runner images.
 
 Package tests and metadata checks run from the parent directory:
 

@@ -131,7 +131,8 @@ jobs:
           - platform: windows
             sdk: minimum
             flutter-version: '3.24.0'
-            runner: windows-latest
+            # Flutter 3.24 recognizes VS 2022, but cannot select VS 2026.
+            runner: windows-2022
           - platform: windows
             sdk: stable
             flutter-version: ''
