@@ -17,6 +17,7 @@
 * Add the missing iPhone X identifier iPhone10,3
 * Reduce iPhone 12/12 Pro/12 Pro Max and 12 mini logo height after notch mask verification
 * Update the Android example build tools and add minimum/current SDK build checks
+* Disable unnecessary Jetifier transforms and increase the Android example Gradle heap
 * Fix a signedness warning treated as an error in the Windows example
 * Restore empty macOS and Linux example scaffold files
 * Update web example initialization and include the Cupertino icon font

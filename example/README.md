@@ -18,6 +18,9 @@ flutter devices
 flutter run -d <device-id>
 ```
 
+The Android example uses AndroidX throughout, so Jetifier is disabled. Gradle
+has a 4 GB maximum heap to handle current Flutter build artifacts.
+
 For iOS, install Xcode and its simulator runtime and complete Apple's setup first.
 Flutter supports Swift Package Manager and CocoaPods integration for this plugin.
 The plugin supports iOS 13 or later; the required deployment target of the example
