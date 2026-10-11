@@ -59,6 +59,14 @@ void main() {
     testConstraintsParsing(DeviceModel.iPhoneAir, bc367x1220);
     testConstraintsParsing(DeviceModel.iPhone17Pro, bc367x1220);
     testConstraintsParsing(DeviceModel.iPhone17ProMax, bc367x1220);
+    testConstraintsParsing(
+      DeviceModel.iPhone18Pro,
+      const BoxConstraints(maxHeight: 36.0, maxWidth: 95.0),
+    );
+    testConstraintsParsing(
+      DeviceModel.iPhone18ProMax,
+      const BoxConstraints(maxHeight: 36.0, maxWidth: 95.0),
+    );
 
     test('Should return 0x0 BoxConstraints if unable to parse iPhone', () {
       final parser = HiddenLogoParser(machineIdentifier: null);
@@ -112,6 +120,8 @@ void main() {
     testTopMarginParsing(DeviceModel.iPhone17, 14.0);
     testTopMarginParsing(DeviceModel.iPhone17Pro, 14.0);
     testTopMarginParsing(DeviceModel.iPhone17ProMax, 14.0);
+    testTopMarginParsing(DeviceModel.iPhone18Pro, 14.3);
+    testTopMarginParsing(DeviceModel.iPhone18ProMax, 14.3);
     testTopMarginParsing(DeviceModel.iPhoneAir, 20.0);
 
     test('Should return 0 top margin if unable to parse iPhone', () {

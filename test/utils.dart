@@ -58,6 +58,8 @@ class TestUtils {
     DeviceModel.iPhoneAir,
     DeviceModel.iPhone17Pro,
     DeviceModel.iPhone17ProMax,
+    DeviceModel.iPhone18Pro,
+    DeviceModel.iPhone18ProMax,
   ];
 
   static DeviceModel getIPhone({LogoType? logoType}) {

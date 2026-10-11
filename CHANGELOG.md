@@ -1,3 +1,7 @@
+## Unreleased
+
+* Add support for iPhone 18 Pro and iPhone 18 Pro Max
+
 ## 1.2.0
 
 **BREAKING: minimum iOS deployment target raised to 13.0 and minimum Flutter SDK to 3.24.0**
