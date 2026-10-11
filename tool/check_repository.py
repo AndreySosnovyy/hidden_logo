@@ -81,7 +81,7 @@ class RepositoryCheck:
                      "README.md / CocoaPods / SwiftPM: iOS deployment minimum must agree")
         workflow = self.read(".github/workflows/main.yml")
         spm_flutter = self.declaration(
-            readme, r"^- Swift Package Manager: Flutter ≥([0-9.]+) on the stable channel;",
+            readme, r"^- Swift Package Manager: Flutter ≥([0-9.]+) \(stable\);",
             "README.md", "Swift Package Manager Flutter minimum")
         pinned_sdks = re.findall(r"flutter-version:\s*'([0-9.]+)'", workflow)
         self.require(flutter is not None and spm_flutter is not None and
@@ -128,7 +128,7 @@ class RepositoryCheck:
                      "lib/src/parser.dart: every DeviceModel must have one logo type case")
         readme = self.read("README.md")
         section = self.declaration(
-            readme, r"### iPhones hardware barrier types \(Target devices\)\s*([\s\S]*?)(?=^## )",
+            readme, r"^## Supported iPhones\s*([\s\S]*?)(?=^## |\Z)",
             "README.md", "target device table")
         if section is None:
             return
@@ -299,7 +299,8 @@ class RepositoryCheck:
                                      f"{relative}: missing icon {filename}")
             except (OSError, ValueError, ET.ParseError, KeyError, TypeError, AttributeError) as error:
                 self.errors.append(f"{relative}: invalid source manifest: {error}")
-        for doc in ("README.md", "example/README.md"):
+        for doc in ("README.md", "example/README.md", "CONTRIBUTING.md",
+                    "adding_new_iphones_support.md", "CHANGELOG.md"):
             for target in re.findall(r"\]\(([^)]+)\)", self.read(doc)):
                 if re.match(r"[a-z]+:|#", target):
                     continue

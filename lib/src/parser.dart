@@ -7,7 +7,7 @@ import 'package:flutter/widgets.dart';
 ///
 /// Different iPhone models have different hardware barriers at the top
 /// of the screen that can hide logos during certain scenarios like
-/// screenshots or when the app is minimized.
+/// screenshots or app-switcher previews, depending on capture timing.
 /// {@endtemplate}
 enum LogoType {
   /// Hardware barrier found on the supported notch models, starting with iPhone X.
@@ -16,8 +16,8 @@ enum LogoType {
   ///
   /// The notch is a black cutout at the top center of the screen that
   /// houses the front camera and sensors. Logos placed behind the notch
-  /// area will be hidden from normal view but visible in screenshots
-  /// and when the app is minimized.
+  /// area are hidden from normal view and can appear in screenshots or
+  /// app-switcher previews, depending on capture timing.
   notch,
 
   /// Hardware barrier found on the supported Dynamic Island models, starting
