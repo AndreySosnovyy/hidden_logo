@@ -1,3 +1,7 @@
+## Unreleased
+
+* Adapt logo constraints and Dynamic Island top padding to iOS Display Zoom
+
 ## 1.2.0
 
 **BREAKING: minimum iOS deployment target raised to 13.0 and minimum Flutter SDK to 3.24.0**
