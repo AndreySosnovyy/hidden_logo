@@ -63,6 +63,30 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
   }
 
   @override
+  void didChangeMetrics() {
+    // Display Zoom changes the view's rendering size while the display keeps
+    // its native pixel dimensions. Recompute both the logo size and its offset.
+    setState(() {});
+  }
+
+  double _logoScale(BuildContext context, HiddenLogoParser parser) {
+    final view = View.of(context);
+    final displayWidth = view.display.size.shortestSide;
+    final viewWidth = view.physicalSize.shortestSide;
+    if (!displayWidth.isFinite || displayWidth <= 0) return 1.0;
+    // Mini models render their standard 375-point UI at 3x, then downsample
+    // to a 1080-pixel display. Compare with that standard render width instead
+    // of the native display width so Zoom does not leave the logo too large.
+    final standardWidth = parser.currentIPhone == DeviceModel.iPhone12Mini ||
+            parser.currentIPhone == DeviceModel.iPhone13Mini
+        ? 375.0 * view.devicePixelRatio
+        : displayWidth;
+    final scale = viewWidth / standardWidth;
+    if (!scale.isFinite || scale <= 0 || scale > 1) return 1.0;
+    return scale;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return OrientationBuilder(
       builder: (context, orientation) {
@@ -75,7 +99,8 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
             }
             _parser ??= HiddenLogoParser(machineIdentifier: snapshot.data);
             final parser = _parser!;
-            final constraints = parser.logoConstraints;
+            final logoScale = _logoScale(context, parser);
+            final constraints = parser.logoConstraints * logoScale;
             return Stack(
               children: [
                 widget.body,
@@ -89,7 +114,7 @@ class _HiddenLogoBaseState extends State<HiddenLogoBase>
                     alignment: Alignment.topCenter,
                     child: Padding(
                       padding: EdgeInsets.only(
-                        top: parser.dynamicIslandTopMargin,
+                        top: parser.dynamicIslandTopMargin * logoScale,
                       ),
                       child: parser.iPhonesLogoType == LogoType.notch
                           ? widget.notchBuilder(context, constraints)

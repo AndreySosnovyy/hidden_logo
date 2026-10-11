@@ -23,6 +23,9 @@ takes a screenshot of your app, minimizes it or uses some kind of screen mirrori
   be worried about the size of your child widget.
 - Corners of your Dynamic Island widget will be **rounded automatically**.
 - Your child widget will only be visible in **portrait mode**.
+- Logo constraints and Dynamic Island positioning adapt to iOS **Display Zoom**.
+  Use the supplied constraints when sizing your logo, and place `HiddenLogo` at
+  the full-screen app level, as shown below.
 
 ## Requirements
 

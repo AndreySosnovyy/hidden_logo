@@ -1,6 +1,7 @@
 ## Unreleased
 
 * Add support for iPhone 18 Pro and iPhone 18 Pro Max
+* Adapt logo constraints and Dynamic Island top padding to iOS Display Zoom
 
 ## 1.2.0
 
