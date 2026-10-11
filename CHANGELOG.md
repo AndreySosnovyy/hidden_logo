@@ -1,3 +1,9 @@
+## 1.3.1
+
+* Simplify README to package usage and compatibility; move development instructions to CONTRIBUTING.md.
+* Trim the example guide and update the device support guide and documentation checks.
+* Clarify capture timing in API documentation; runtime behavior is unchanged.
+
 ## 1.3.0
 
 * Add documentation and manifest consistency checks, including native asset references
