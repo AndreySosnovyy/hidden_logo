@@ -25,6 +25,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Validate GitHub Actions workflow
+        if: matrix.sdk == 'minimum'
+        run: docker run --rm --volume "$PWD:/repo" --workdir /repo rhysd/actionlint:1.7.12 -color
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -195,7 +199,6 @@ jobs:
     env:
       # Keep integration settings local to each clean matrix checkout. Flutter
       # 3.24 uses SWIFT_PACKAGE_MANAGER; newer SDKs use the prefixed name.
-      XDG_CONFIG_HOME: ${{ runner.temp }}/flutter-config
       SWIFT_PACKAGE_MANAGER: ${{ matrix.use-spm }}
       FLUTTER_SWIFT_PACKAGE_MANAGER: ${{ matrix.use-spm }}
 
@@ -208,6 +211,11 @@ jobs:
         # Flutter lane on a toolchain that can still build the library's floor.
         if: matrix.sdk == 'minimum'
         run: sudo xcode-select --switch /Applications/Xcode_16.4.app/Contents/Developer
+
+      - name: Initialize isolated Flutter configuration
+        run: |
+          mkdir -p "$RUNNER_TEMP/flutter-config"
+          echo "XDG_CONFIG_HOME=$RUNNER_TEMP/flutter-config" >> "$GITHUB_ENV"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2

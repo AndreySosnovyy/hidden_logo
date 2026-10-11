@@ -217,3 +217,6 @@ Linux, Windows and macOS examples with the minimum and current stable Flutter
 SDKs. Formatting is checked with Flutter 3.24.0
 because Dart formatter output changes between SDK releases. See the
 [example instructions](example/README.md) for local builds and visual checks.
+
+CI also validates the workflow with actionlint 1.7.12, including GitHub expression
+contexts that a YAML syntax check alone does not verify.
