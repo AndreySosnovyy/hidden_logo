@@ -144,6 +144,12 @@ enum DeviceModel {
 
   /// iPhone 17e
   iPhone17e,
+
+  /// iPhone 18 Pro
+  iPhone18Pro,
+
+  /// iPhone 18 Pro Max
+  iPhone18ProMax,
 }
 
 /// {@template hidden_logo.HiddenLogoParser}
@@ -188,6 +194,9 @@ class HiddenLogoParser {
     '18,3': DeviceModel.iPhone17,
     '18,4': DeviceModel.iPhoneAir,
     '18,5': DeviceModel.iPhone17e,
+    '19,2': DeviceModel.iPhone18Pro,
+    '19,3': DeviceModel.iPhone18ProMax,
+    '19,7': DeviceModel.iPhone18ProMax,
   };
 
   /// Returns the machine identifier suffix for a given iPhone model.
@@ -285,6 +294,8 @@ class HiddenLogoParser {
       case DeviceModel.iPhoneAir:
       case DeviceModel.iPhone17Pro:
       case DeviceModel.iPhone17ProMax:
+      case DeviceModel.iPhone18Pro:
+      case DeviceModel.iPhone18ProMax:
         return LogoType.dynamicIsland;
       case DeviceModel.iPhoneX:
       case DeviceModel.iPhoneXr:
@@ -372,7 +383,8 @@ class HiddenLogoParser {
   /// - **iPhone X series**: 30.0×209.0 or 33.0×230.0 depending on model
   /// - **iPhone 12 series**: 32.2×211.0 to 37.4×175.0 depending on model
   /// - **iPhone 13-16 series**: 33.0×162.0 for standard models
-  /// - **Dynamic Island models**: 36.7×122.0 for all Dynamic Island devices
+  /// - **Dynamic Island models through iPhone 17**: 36.7×122.0
+  /// - **iPhone 18 Pro/Pro Max**: 36.0×95.0
   ///
   /// Returns zero constraints (0×0) for unsupported devices, which should
   /// be validated before use.
@@ -431,6 +443,10 @@ class HiddenLogoParser {
       case DeviceModel.iPhone17Pro:
       case DeviceModel.iPhone17ProMax:
         return const BoxConstraints(maxHeight: 36.7, maxWidth: 122.0);
+      case DeviceModel.iPhone18Pro:
+      case DeviceModel.iPhone18ProMax:
+        // Inset slightly from the smaller Dynamic Island mask.
+        return const BoxConstraints(maxHeight: 36.0, maxWidth: 95.0);
       case null:
         return const BoxConstraints(maxHeight: 0, maxWidth: 0);
     }
@@ -445,6 +461,7 @@ class HiddenLogoParser {
   /// Margin values by device generation:
   /// - **iPhone 14 Pro/15 series**: 11.3 pixels
   /// - **iPhone 16 Pro/17 series**: 14.0 pixels
+  /// - **iPhone 18 Pro/Pro Max**: 14.3 pixels
   /// - **iPhone Air**: 20.0 pixels
   /// - **All notch devices**: 0.0 pixels (no margin needed)
   ///
@@ -473,6 +490,9 @@ class HiddenLogoParser {
       case DeviceModel.iPhone17Pro:
       case DeviceModel.iPhone17ProMax:
         return 14.0;
+      case DeviceModel.iPhone18Pro:
+      case DeviceModel.iPhone18ProMax:
+        return 14.3;
       case DeviceModel.iPhoneAir:
         return 20.0;
       case DeviceModel.iPhoneX:

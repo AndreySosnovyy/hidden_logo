@@ -16,7 +16,7 @@ takes a screenshot of your app, minimizes it or uses some kind of screen mirrori
 
 - **Application running on any other devices not marked as target ones will not be
   affected**. Currently, the list of target devices only contains all iPhones starting
-  from iPhone X all the way up to iPhone 17 series. </br>
+  from iPhone X through the iPhone 17 series, plus iPhone 18 Pro and Pro Max. </br>
   You can see the [List of Target iPhones](#iphones-hardware-barrier-types-target-devices) separated by hardware barrier
   type (Notch or Dynamic Island) in the table down below.
 - It provides **precise size constraints for every iPhone**. So you don't need to
@@ -115,8 +115,8 @@ Device → Trigger Screenshot)
 | 13         | Air            |
 | 13 Mini    | 17 Pro         |
 | 13 Pro     | 17 Pro Max     |
-| 13 Pro Max |                |
-| 14         |                |
+| 13 Pro Max | 18 Pro         |
+| 14         | 18 Pro Max     |
 | 14 Plus    |                |
 | 16e        |                |
 | 17e        |                |
