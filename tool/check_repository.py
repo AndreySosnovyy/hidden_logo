@@ -81,7 +81,7 @@ class RepositoryCheck:
                      "README.md / CocoaPods / SwiftPM: iOS deployment minimum must agree")
         workflow = self.read(".github/workflows/main.yml")
         spm_flutter = self.declaration(
-            readme, r"^- Swift Package Manager: Flutter ≥([0-9.]+) \(stable\);",
+            readme, r"^- Swift Package Manager: Flutter ≥([0-9.]+) on the stable channel\s*$",
             "README.md", "Swift Package Manager Flutter minimum")
         pinned_sdks = re.findall(r"flutter-version:\s*'([0-9.]+)'", workflow)
         self.require(flutter is not None and spm_flutter is not None and
@@ -128,7 +128,7 @@ class RepositoryCheck:
                      "lib/src/parser.dart: every DeviceModel must have one logo type case")
         readme = self.read("README.md")
         section = self.declaration(
-            readme, r"^## Supported iPhones\s*([\s\S]*?)(?=^## |\Z)",
+            readme, r"^### iPhones hardware barrier types \(Target devices\)\s*([\s\S]*?)(?=^## |\Z)",
             "README.md", "target device table")
         if section is None:
             return

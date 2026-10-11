@@ -1,3 +1,7 @@
+## 1.3.2
+
+* Restore the original README sections and practical tips with current usage and compatibility information.
+
 ## 1.3.1
 
 * Simplify README to package usage and compatibility; move development instructions to CONTRIBUTING.md.
